@@ -48,6 +48,29 @@ app.get('/',  (req, res) => {
   })
 });
 
+app.delete('/delete/:id',  (req, res) => {
+  const {id} = req.params;
+  if (isNaN(id)) {
+    return res.status(400).json({ message: 'Некорректный ID' });
+  }
+
+  const query = 'DELETE FROM des.hosts WHERE id = ?';
+
+  connection.query(query, [id], (error, result) => {
+      if (error) {
+          console.error('Ошибка при удалении записи:', error);
+          return res.status(500).json({ message: 'Ошибка сервера' });
+      }
+
+      if (result.affectedRows > 0) {
+          return res.status(200).json({ message: `Удалено записей: ${result.affectedRows}` });
+      } else {
+          return res.status(404).json({ message: 'Запись не найдена' });
+      }
+  })
+});
+
+
 app.use(AuthRouter);
 
 // const users = [
