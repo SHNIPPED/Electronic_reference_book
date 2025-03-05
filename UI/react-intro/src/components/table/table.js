@@ -3,36 +3,34 @@ import { useNavigate } from 'react-router-dom';
 import './table.css';
 
 function Table(){
-    let DisplayData = null;
+  let DisplayData = null;
 
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    useEffect(() => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/login');
-      }
-    }, [navigate]);
-
-
-    const [hosts, setHosts] = useState([])
-
-    const fetchData = () => {
-      fetch("http://192.168.19.50:3001/")
-        .then(response => {
-          return response.json()
-        })
-        .then(data => {
-            setHosts(data)
-        })
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) {
+      navigate('/login');
     }
+  },[navigate]);
+
+
+  const [hosts, setHosts] = useState([])
+
+  const fetchData = () => {
+    fetch("http://192.168.19.50:3001/")
+      .then(response => {
+        return response.json()
+      })
+      .then(data => {
+          setHosts(data)
+      })
+  }
   
-    useEffect(() => {
-      fetchData()
-    }, [])
-
-
+  useEffect(() => {
+    fetchData()
+  }, [])
 
 
 
@@ -80,3 +78,13 @@ function Table(){
 }
 
 export default Table
+
+   // {
+       // "id": 40,
+     //   "fcs": "Романова Светлана Сергеевна",
+      //  "post": "Ведущий документовед",
+     //   "phone_number": "207-63-56 (707)",
+     //   "Email": "ssromanova@des.permkrai.ru",
+    //    "addres": "ул.Крупской,5 каб.104",
+   //     "deport": "0"
+   // },

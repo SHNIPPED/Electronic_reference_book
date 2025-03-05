@@ -1,8 +1,9 @@
-const express = require('express');
-const mysql = require("mysql2");
-const cors = require ('cors')
-const jwt = require('jsonwebtoken');
-const bodyParser = require('body-parser');
+import express from 'express';
+import mysql  from"mysql2";
+import cors  from'cors';
+import jwt  from'jsonwebtoken';
+import bodyParser  from'body-parser';
+import AuthRouter  from'./routes/AuthRouter.js'; 
 
 const app = express();
 const SECRET_KEY = 'your_secret_key';
@@ -47,40 +48,26 @@ app.get('/',  (req, res) => {
   })
 });
 
-const users = [
-  { id: 1, username: '1', password: '1' },
-];
+app.use(AuthRouter);
 
-function authenticateUser(username, password) {
-  return users.find(user => user.username === username && user.password === password);
-}
+// const users = [
+//   { id: 1, username: '1', password: '1' },
+// ];
 
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
+// function authenticateUser(username, password) {
+//   return users.find(user => user.username === username && user.password === password);
+// }
 
-  const user = authenticateUser(username, password);
+// app.post('/login', (req, res) => {
+//   const { username, password } = req.body;
 
-  if (user) {
-      const token = jwt.sign({ userId: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
+//   const user = authenticateUser(username, password);
 
-      res.json({ token });
-  } else {
-      res.status(401).json({ message: 'Неверные учетные данные' });
-  }
-});
+//   if (user) {
+//       const token = jwt.sign({ userId: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
 
-app.get('/protected', (req, res) => {
-  const token = req.headers['authorization'];
-
-  if (!token) {
-      return res.status(403).json({ message: 'Токен не предоставлен' });
-  }
-
-  jwt.verify(token, SECRET_KEY, (err, decoded) => {
-      if (err) {
-          return res.status(401).json({ message: 'Неверный токен' });
-      }
-
-      res.json({ message: 'Доступ разрешен', user: decoded });
-  });
-});
+//       res.json({ token });
+//   } else {
+//       res.status(401).json({ message: 'Неверные учетные данные' });
+//   }
+// });
