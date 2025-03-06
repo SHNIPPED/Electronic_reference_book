@@ -21,14 +21,17 @@
 
 .host-cell {
     position: relative; 
-    padding-right: 40px; 
+    padding-right: 80px; 
 }
-  
-.host-button {
+
+.host-div{
     position: absolute; 
     right: 0; 
     top: 50%; 
     transform: translateY(-50%); 
+}
+  
+.host-button {
     border: none;
     background: none; 
     cursor: pointer; 
@@ -89,4 +92,8 @@
     display: flex;
     flex-direction: row; 
     gap: 10px;
+}
+
+.div-form{
+    position: fixed;
 }

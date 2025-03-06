@@ -1,12 +1,10 @@
 import express from 'express';
 import mysql  from"mysql2";
 import cors  from'cors';
-import jwt  from'jsonwebtoken';
 import bodyParser  from'body-parser';
 import AuthRouter  from'./routes/AuthRouter.js'; 
 
 const app = express();
-const SECRET_KEY = 'your_secret_key';
 
 
 app.use(bodyParser.json());
@@ -70,27 +68,51 @@ app.delete('/delete/:id',  (req, res) => {
   })
 });
 
+app.post('/create',     (req,res) =>{
+   const {fcs,host} = req.body;
+   if(!fcs || !host){
+    return res.status(400).json({message: 'Необходимо указать ФИО и хост'});
+   }
+
+    const query = "INSERT INTO `des`.`hosts` (`fcs`, `host`) VALUES (?, ?);";
+
+    connection.query(query,[fcs,host],(error,result) =>{
+      if(error){
+          console.error('Ошибка при добавлении записи:', error);
+          return res.status(500).json({message: 'Ошибка сервера'});
+      }
+
+      if(result.affectedRows >0){
+        return res.status(200).json({message: `Добавлена запись: ${result.affectedRows}`});
+      }else{
+        return res.status(404).json({message:'Запись не добавлена'});
+      }
+    })
+   });
+
+   app.post('/edit/:id',   (req,res) =>{
+    const {fcs,host} = req.body;
+    const {id} = req.params;
+    if(!fcs || !host || !id){
+     return res.status(400).json({message: 'Необходимо указать ФИО и хост'});
+    }
+ 
+     const query = 'UPDATE des.hosts SET `fcs` = ?, `host` = ? WHERE (`id` = ?);';
+ 
+     connection.query(query,[fcs,host,id],(error,result) =>{
+       if(error){
+           console.error('Ошибка при изменении записи:', error);
+           return res.status(500).json({message: 'Ошибка сервера'});
+       }
+ 
+       if(result.affectedRows >0){
+         return res.status(200).json({message: `Изменена запись: ${result.affectedRows}`});
+       }else{
+         return res.status(404).json({message:'Запись не изменена'});
+       }
+     })
+    });
+ 
+
 
 app.use(AuthRouter);
-
-// const users = [
-//   { id: 1, username: '1', password: '1' },
-// ];
-
-// function authenticateUser(username, password) {
-//   return users.find(user => user.username === username && user.password === password);
-// }
-
-// app.post('/login', (req, res) => {
-//   const { username, password } = req.body;
-
-//   const user = authenticateUser(username, password);
-
-//   if (user) {
-//       const token = jwt.sign({ userId: user.id, username: user.username }, SECRET_KEY, { expiresIn: '1h' });
-
-//       res.json({ token });
-//   } else {
-//       res.status(401).json({ message: 'Неверные учетные данные' });
-//   }
-// });
