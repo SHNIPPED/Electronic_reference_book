@@ -2,124 +2,169 @@ import React, { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom';
 import './table.css';
 import trash from '../pictures/trash.png'
+import edit from '../pictures/edit.png'
 
 function Table(){
-  let DisplayData = null;
+    const [fcs, setFCS] = useState('');
+    const [host, setHost] = useState('');
+    const [editingUser, setEditingUser] = useState(null);
+    const [hosts, setHosts] = useState([]);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');
+        }
+    }, [navigate]);
 
 
-  const navigate = useNavigate();
+    const fetchData = () => {
+        fetch("http://192.168.19.50:3001/")
+            .then(response => response.json())
+            .then(data => setHosts(data))
+            .catch(error => console.error('Ошибка при загрузке данных:', error));
+    };
 
-  useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/login');
-    }
-  },[navigate]);
+    useEffect(() => {
+        fetchData();
+    }, []);
 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-  const [hosts, setHosts] = useState([])
+        if (!fcs || !host) {
+            alert('Пожалуйста, заполните все поля');
+            return;
+        }
 
-  const fetchData = () => {
-    fetch("http://192.168.19.50:3001/")
-      .then(response => {
-        return response.json()
-      })
-      .then(data => {
-          setHosts(data)
-      })
-  }
-  
-  useEffect(() => {
-    fetchData()
-  }, [])
+        const userData = { fcs, host };
 
+        try {
+            let response;
+            if (editingUser) {
+                console.log(userData)
+                response = await fetch(`http://192.168.19.50:3001/edit/${editingUser.id}`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData),
+                });
+            } else {
+
+                response = await fetch('http://192.168.19.50:3001/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(userData),
+                });
+            }
+
+                const data = await response.json();
+                alert(data.message);
+                setFCS('');
+                setHost('');
+                setEditingUser(null);
+                fetchData();
+        } catch (error) {
+            console.error('Ошибка при отправке данных:', error);
+            alert('Произошла ошибка');
+        }
+    };
 
     const handleDelete = async (id) => {
-      const _id = id;
         try {
-            const response = await fetch(`http://192.168.19.50:3001/delete/${_id}`, {
+            const response = await fetch(`http://192.168.19.50:3001/delete/${id}`, {
                 method: 'DELETE',
             });
-            fetchData();
-           
+            if (response.ok) {
+                fetchData();
+            } else {
+                const errorData = await response.json();
+                alert(`Ошибка: ${errorData.message}`);
+            }
         } catch (error) {
             console.error('Ошибка:', error);
         }
     };
 
-    DisplayData=hosts.map(
-        (info)=>{
+    const startEditing = (user) => {
+        setEditingUser(user);
+        setFCS(user.fcs)
+        setHost(user.host)
+    };
 
 
-            const s = {}
-            if(info.id === 31) s.background = 'yellow'
-            return(
+    const DisplayData = hosts.map((info) => (
+        <tbody key={info.id} className='table_host'>
+            <tr className='th_host'>
+                <td className='tb_host'>{info.id}</td>
+                <td className='tb_host'>{info.fcs}</td>
+                <td className='tb_host host-cell'>
+                    {info.host}
+                    <div className="host-div">
+                        <button className="host-button" onClick={() => startEditing(info)}>
+                            <img className="host-button" src={edit} alt="Edit" />
+                        </button>
+                        <button className="host-button" onClick={() => handleDelete(info.id)}>
+                            <img className="host-button" src={trash} alt="Delete" />
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    ));
 
-                <tbody class='table_host' style={s}>  
-
-                <tr class ='th_host'>
-                    <td class ='tb_host' >{info.id}</td>  
-                    <td class ='tb_host'>{info.fcs}</td>
-                    <td class ='tb_host host-cell' >{info.host}
-                      <button value={info.id} class="host-button" onClick={() =>handleDelete(info.id)} >
-                        <img  class="host-button" src={trash}/>
-                      </button>
-                    </td>
-                </tr>
-
-                </tbody>
-
-            )
-        }
-    )
-
-
-
-    return(
-      <div class="div_table">
-
-        <div class="table">
-             <table>
-                    <thead class="thead">
+    return (
+        <div className="div_table">
+            <div className="table">
+                <table>
+                    <thead className="thead">
                         <tr>
                             <th>№</th>
                             <th>ФИО</th>
                             <th>Хост</th>
                         </tr>
                     </thead>
-                          
-                 
-                        {DisplayData}
+                    {DisplayData}
                 </table>
+            </div>
+            <div>
+              <div class="div-form">
+                  <form className="login-form" onSubmit={handleSubmit}>
+                      <div className="form-group">
+                          <label htmlFor="fcs">ФИО</label>
+                          <input
+                              type="text"
+                              id="fcs"
+                              value={fcs}
+                              onChange={(e) => setFCS(e.target.value)}
+                              placeholder="Введите ФИО"
+                              required
+                          />
+                      </div>
+                      <div className="form-group">
+                          <label htmlFor="host">Хост</label>
+                          <input
+                              type="text"
+                              id="host"
+                              value={host}
+                              onChange={(e) => setHost(e.target.value)}
+                              placeholder="Введите хост"
+                              required
+                          />
+                      </div>
+                      <button type="submit" className="login-button">
+                          {editingUser ? 'Изменить' : 'Добавить пользователя'}
+                      </button>
+                  </form>
+              </div>
+            </div>
         </div>
-        <div>
-      <div>
-      <form className="login-form"  >
-        <div className="form-group">
-          <label htmlFor="fcs"> ФИО</label>
-          <input
-            type="text"
-            id="fcs"
-             placeholder="Введите ФИО"
-            required
-          />
-        </div>
-        <div className="form-group">
-          <label htmlFor="host">Хост</label>
-          <input
-            type="text"
-            id="host"
-            placeholder="Введите хост"
-            required
-          />
-        </div>
-        <button type="submit" className="login-button" > Добавить </button>
-      </form>
-    </div>
-        </div>
-      </div>
     );
-}
+};
 
 export default Table
 

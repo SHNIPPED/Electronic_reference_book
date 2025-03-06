@@ -250,8 +250,8 @@
 }
 
 .image-container {
-  width: 350px;
-  height: 200px; 
+  width: 375px;
+  height: 375px; 
   overflow: hidden;
   display: flex;
 }

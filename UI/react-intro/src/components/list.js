@@ -14,6 +14,7 @@ import rz from './pictures/rz.png'
 import ufhd from './pictures/ufhd.png'
 import pp from './pictures/pp.png'
 import cw from './pictures/cw.jpg'
+import mart from './pictures/mart.jpg'
 
 function List(){
     const navigate = (url) =>{
@@ -93,6 +94,11 @@ function List(){
                 </div>  
             </div>
 
+            <div class="list-logo">
+                <div class="image-container" > 
+                    <img  src={mart} alt = "CirWIKI" />
+                </div>  
+            </div>
            
         </div>  
     );
