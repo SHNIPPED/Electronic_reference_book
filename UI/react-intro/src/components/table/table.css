@@ -1,99 +1,99 @@
-
 .table_host {
-    margin: 20px 0;
+  margin: 20px 0;
 }
 
-.th_host{
-    padding: 12px;
-    text-align: left;
-    border-bottom: 1px solid #0077cc; 
-    border-right: 1px solid #0077cc; 
+.th_host {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #0077cc;
+  border-right: 1px solid #0077cc;
 }
 
-.tb_host{
-    padding-left: 12px;
-    padding-top: 12px;
-    padding-bottom: 12px;
-    text-align: left;
-    border-bottom: 1px solid #0077cc; 
-    border-right: 1px solid #0077cc; 
+.tb_host {
+  padding-left: 12px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  text-align: left;
+  border-bottom: 1px solid #0077cc;
+  border-right: 1px solid #0077cc;
 }
 
 .host-cell {
-    position: relative; 
-    padding-right: 80px; 
+  position: relative;
+  padding-right: 80px;
 }
 
-.host-div{
-    position: absolute; 
-    right: 0; 
-    top: 50%; 
-    transform: translateY(-50%); 
+.host-div {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
-  
+
 .host-button {
-    border: none;
-    background: none; 
-    cursor: pointer; 
-}
-  
-.host-button img {
-    width: 20px;
-    height: 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-  
+.host-button img {
+  width: 20px;
+  height: 20px;
+}
+
 .form_host {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 300px;
-    margin: 20px auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 300px;
+  margin: 20px auto;
 }
 
 .input_host {
-    padding: 8px;
-    font-size: 16px;
+  padding: 8px;
+  font-size: 16px;
 }
 
-  
 .button_host {
-    background-color: #02319b;
-    color: white;
-    padding: 0.75rem;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .button_host:hover {
-    background-color: #1565c0;
-  }
+  background-color: #02319b;
+  color: white;
+  padding: 0.75rem;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
-/* Стили для модального окна */
+.button_host:hover {
+  background-color: #1565c0;
+}
+
 .ReactModal__Overlay {
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .ReactModal__Content {
-    background: white;
-    padding: 20px;
-    border-radius: 8px;
-    max-width: 500px;
-    width: 100%;
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 500px;
+  width: 100%;
 }
 
-.div_table{
-    display: flex;
-    flex-direction: row; 
-    gap: 10px;
+.div_table {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
 
-.div-form{
-    position: fixed;
+.div-form {
+  position: fixed;
+}
+
+.div-contract {
+  padding-left: 0px;
 }
