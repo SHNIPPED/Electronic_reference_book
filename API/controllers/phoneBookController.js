@@ -1,66 +1,64 @@
-import HostsModule from "../models/hostsModules.js";
+import PhoneBookModel from '../models/phoneBookModule.js';
 
-class HostsController{
+class PhoneBookController{
 
-
-	static async getAll(req, res) {
+    static async getAll(req,res){
         try{
-            const hosts = await HostsModule.getAll();
+            const phoneBooks = await PhoneBookModel.getAll();
             return res.status(200).json({ 
-                hosts
+                phoneBooks
             });
         }
         catch(error) {
             return res.status(500).json({ message: 'Ошибка сервера' });
         }
-	}
+    }
 
-   static async create(req,res){
-		try{
-            const { fcs, host } = req.body;
+    static async create(req, res) {
+        try {
+            const { fcs, post, phone_number, email, addres, deport } = req.body;
           
-            if (!fcs || !host ) {
+            if (!fcs || !post || !deport) {
                 return res.status(400).json({ message: 'Необходимо заполнить все обязательные поля' });
             }
     
-            const result = await HostsModule.create({ fcs, host });
+            const result = await PhoneBookModel.create({ fcs, post, phone_number, email, addres, deport });
     
             if (result.affectedRows > 0) {
-                return res.status(200).json({
+                return res.status(200).json({ 
                 message: `Добавлена запись: ${result.affectedRows}`,
                 id: result.insertId });
             } 
             else {
                 return res.status(404).json({ message: 'Запись не добавлена' });
             }
-		}
-		catch(error){
+        } 
+        catch (error) {
             console.error('Ошибка при добавлении записи:', error);
             return res.status(500).json({ message: 'Ошибка сервера' });
-		}
-	}
+        }
+    }
 
-	static async update(req,res){
-        try{
-            const {id } = req.params;
-            const { fcs, host } = req.body;
-
-            if (!fcs || !host || !id) {
+    static async update(req, res) {
+        try {
+            const { id } = req.params;
+            const { fcs, post, phone_number, email, addres, deport } = req.body;
+    
+            if (!fcs || !post || !deport || !id) {
                 return res.status(400).json({ message: 'Необходимо заполнить все обязательные поля' });
             }
+    
+            const result = await PhoneBookModel.update(id, { fcs, post, phone_number, email, addres, deport });
 
-            const result = await HostsModule.update(id,{ fcs, host});
-
+    
             if (result && result.affectedRows > 0) {
                 return res.status(200).json({ 
-                message: `Изменена запись: ${result.affectedRows}`
+                    message: `Изменена запись: ${result.affectedRows}`
                 });
-            } 
-            else {
-                return res.status(404).json({ message: 'Запись не изменена' });
+            } else {
+                return res.status(404).json({ message: `Запись не изменена`});
             }
-        }
-        catch(error){
+        } catch (error) {
             console.error('Ошибка при изменении записи:', error);
             return res.status(500).json({ message: 'Ошибка сервера' });
         }
@@ -74,7 +72,7 @@ class HostsController{
                 return res.status(400).json({ message: 'Некорректный ID' });
             }
       
-            const result = await HostsModule.delete(id);
+            const result = await PhoneBookModel.delete(id);
       
             if (result.affectedRows > 0) {
                 return res.status(200).json({ 
@@ -90,6 +88,6 @@ class HostsController{
             return res.status(500).json({ message: 'Ошибка сервера' });
         }
     }
-
 }
-export default HostsController;
+
+export default PhoneBookController;

@@ -94,6 +94,77 @@
   position: fixed;
 }
 
+.div-button {
+  position: fixed;
+  top: 20px;
+  right: 10px;
+  background: transparent;
+}
+
 .div-contract {
   padding-left: 0px;
+}
+
+.button-rgb{
+  position: relative;
+  color: #02319b;
+  border: transparent;
+  background: transparent;
+  width: 250px;
+  height: 70px;
+  line-height: 64px;
+  transition: all 0.3s;
+  span {
+    transition: all 0.3s;
+    tranform: scale(1, 1);
+  }
+}
+
+.button-rgb::before, .button-rgb::after {
+  content: '';
+  position: absolute;
+  transition: all 0.3s;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.button-rgb::before, .button-rgb::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  bottom: 0;
+  left: 0;
+  z-index: 1;
+  transition: all 0.3s;
+  border: 1px solid #02319b;
+}
+
+.button-rgb:hover::after {
+  animation-name: rotatecw;
+  animation-duration: 2s;
+}
+.button-rgb:hover::before {
+  animation-name: rotateccw; 
+  animation-duration: 3s;
+}
+.button-rgb:hover::after, .button-rgb:hover::before {
+  left: 96px;
+  width: 64px;
+  
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes rotatecw {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(350deg);}
+}
+
+@keyframes rotateccw {
+    from {transform: rotate(0deg);}
+    to {transform: rotate(-350deg);}
 }
