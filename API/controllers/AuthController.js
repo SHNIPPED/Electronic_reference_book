@@ -14,7 +14,7 @@ class AuthController{
             res.json({token});
         }
         catch(e){
-            res.status(500).json("error");
+            res.status(500).json("erro");
         }
     }
 }
