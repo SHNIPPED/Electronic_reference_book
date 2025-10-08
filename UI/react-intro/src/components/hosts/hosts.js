@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import "./table.css";
+import "./hosts.css";
 import trash from "../pictures/trash.png";
 import edit from "../pictures/edit.png";
 import axios from 'axios';
 
-function Table() {
+function Hosts() {
   const [fcs, setFCS] = useState("");
   const [host, setHost] = useState("");
   const [editingUser, setEditingUser] = useState(null);
@@ -170,11 +170,11 @@ function Table() {
         </div>
       </div>
       <div class="div-button">
-          <button className="button-rgb" onClick={() => navigate("/test")}>
+          <button className="button-rgb" onClick={() => navigate("/Phone")}>
               Электронная книга
           </button>
       </div>
     </div>
   );
 }
-export default Table;
+export default Hosts;

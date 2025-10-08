@@ -17,7 +17,6 @@ function Login (){
       console.error('Ошибка при авторизации:', error);
       alert('Неверный логин или пароль');
     }
-
   };
 
   useEffect(() => {

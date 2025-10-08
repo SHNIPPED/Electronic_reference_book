@@ -1,0 +1,45 @@
+.app_removal {
+    position: relative;
+    height: 100svh;
+    background: transparent;
+    overflow: hidden;
+    font-family: "Montserrat", sans-serif;
+    color: #fff;
+    font-size: 18px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.removal {
+    position: absolute;
+    font-size: 150px;
+    font-weight: 500;
+    color: #02319b;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    white-space: nowrap; 
+    animation: removalAnim 1.5s ease forwards;
+    transform: translateY(-50%);
+}
+
+@keyframes removalAnim {
+    0% {
+        transform: translate(100vw, -50%); 
+        opacity: 0;
+    }
+    100% {
+        transform: translate(0, -50%);
+        opacity: 1;
+    }
+}
+
+.removal_div{
+    margin-top: 30%;
+}
+
+.h2_rem {
+    color: #02319b;
+    white-space: nowrap; /* Это запрещает перенос текста */
+}

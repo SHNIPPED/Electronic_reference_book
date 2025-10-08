@@ -1,8 +1,11 @@
-import {express}  from 'express'
+import express  from 'express'
 import HostsController from '../controllers/HostsControllers.js'
 
-const route = express.Router();
+const router = express.Router();
 
-route.get('/Hosts', HostsController.getAll);
+router.get('/',HostsController.getAll);
+router.post('/create', HostsController.create);
+router.post('/edit/:id', HostsController.update);
+router.delete('/delete/:id', HostsController.delete);
 
-export default route;
+export default router;

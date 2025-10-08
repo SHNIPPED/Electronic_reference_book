@@ -1,0 +1,60 @@
+.app_error{
+    position: relative;
+    height: 100svh;
+    background: #050505;
+    overflow: hidden;
+    font-family: "Montserrat", sans-serif;
+    color: #fff;
+    font-size: 18px;
+}
+.div_error {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+    animation: catAnim 1.5s ease forwards;
+    display: flex;
+    justify-content: center;
+}
+.img_error{
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+}
+@keyframes catAnim {
+    0%{
+        translate: 0 50%;
+    }
+    100%{
+        translate: 0 0;
+    }
+}
+.okak{
+    position: absolute;
+    bottom: 150px;
+    left: 50%;
+    translate: -50% 0;
+    font-weight: 900;
+    font-size: 115px;
+}
+.error{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    font-size: 750px;
+    font-weight: 900;
+    transform: translate(-50%, 800px);
+    animation: errorAnim 1.5s ease forwards;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+@keyframes errorAnim {
+    100% {
+        transform: translate(-50%, -400px);
+    }
+}
