@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
 
 import AuthRouter from './routes/AuthRouter.js';
 import phoneBookRoutes from './routes/phoneBookRoutes.js';
 import hostsRoutes from './routes/HostsRoutes.js'
 
+dotenv.config();
 const app = express();
 
 app.use(bodyParser.json());

@@ -21,7 +21,7 @@ function Table() {
 
   const fetchData = async () =>{
     try {
-        const response = await axios.get("http://192.168.19.50:3001/");
+        const response = await axios.get("http://192.168.19.117:3001/");
         
         if (response.data && response.data.hosts) {
             setHosts(response.data.hosts);
@@ -55,13 +55,13 @@ function Table() {
         if (editingUser) {
             console.log(userData)
             response = await axios.post(
-                `http://192.168.19.50:3001/edit/${editingUser.id}`,
+                `http://192.168.19.117:3001/edit/${editingUser.id}`,
                 userData
                
             );
         } else {
             response = await axios.post(
-                `http://192.168.19.50:3001//create`,
+                `http://192.168.19.117:3001//create`,
                 userData
             );
         }
@@ -84,7 +84,7 @@ function Table() {
 
   const handleDelete = async (id) => {
     try {
-        const response = await axios.delete(`http://192.168.19.50:3001/delete/${id}`);
+        const response = await axios.delete(`http://192.168.19.117:3001/delete/${id}`);
         
         alert(response.data.message);
         fetchData();

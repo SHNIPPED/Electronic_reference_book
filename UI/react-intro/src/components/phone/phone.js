@@ -18,7 +18,7 @@ function Phone(){
 
     const fetchData = async () => {
         try {
-            const response = await axios.get("http://192.168.19.50:3001/PhoneBook");
+            const response = await axios.get("http://192.168.19.117:3001/PhoneBook");
             
             if (response.data && response.data.phoneBooks) {
                 sortPeople(response.data.phoneBooks);
@@ -63,13 +63,13 @@ function Phone(){
             if (editingUser) {
                 console.log(userData)
                 response = await axios.post(
-                    `http://192.168.19.50:3001/PhoneBook/edit/${editingUser.id}`,
+                    `http://192.168.19.117:3001/PhoneBook/edit/${editingUser.id}`,
                     userData
                    
                 );
             } else {
                 response = await axios.post(
-                    `http://192.168.19.50:3001/PhoneBook/create`,
+                    `http://192.168.19.117:3001/PhoneBook/create`,
                     userData
                 );
             }
@@ -95,7 +95,7 @@ function Phone(){
     
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`http://192.168.19.50:3001/PhoneBook/delete/${id}`);
+            const response = await axios.delete(`http://192.168.19.117:3001/PhoneBook/delete/${id}`);
             
             alert(response.data.message);
             fetchData();

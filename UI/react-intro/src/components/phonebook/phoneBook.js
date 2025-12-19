@@ -15,7 +15,7 @@ function PhoneBook(){
     useEffect(() => {
         const fetchData = async () =>{
             try {
-                const response = await axios.get("http://192.168.19.50:3001/PhoneBook");
+                const response = await axios.get("http://192.168.19.117:3001/PhoneBook");
                 
                 if (response.data && response.data.phoneBooks) {
                     setPhone(response.data.phoneBooks);

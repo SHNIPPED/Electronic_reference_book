@@ -1,14 +1,34 @@
+import AuthModel from '../models/AuthModules.js';
+
 class AuthService {
 
-    async login(login,password){
+    static async login(login, pwd) {
+        try {       
+            const user = await AuthModel.findByLogin(login);
+            
+            if (!user) {
+                console.log('Пользователь не найден');
+                throw new Error('User not found');
+            }
 
-    const users = [
-        { id: 1, login: '1', password: '1' },
-        { id: 2, login: 'admin', password:'Xzasdc123'},
-    ];
+            const users  = user[0]
+            
+            if (pwd !== users.pwd) {
+                console.log('Пароли не совпадают');
+                throw new Error('Invalid password');
+            }
+            else{
+                console.log(`Успешная аутентификация`);
+                return {
+                  user
+                };
+            }              
 
-    return users.find(user => user.login === login && user.password === password);
-
+        } catch (error) {
+            console.error('AuthService login error:', error);
+            throw error;
+        }
     }
 }
-export default new AuthService();
+
+export default AuthService;

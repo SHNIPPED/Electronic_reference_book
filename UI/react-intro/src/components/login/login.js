@@ -4,15 +4,15 @@ import axios from 'axios';
 
 function Login (){
   const [login, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [pwd, setPassword] = useState('');
   const [token, setToken] = useState('');
 
   const handleLogin = async (e) => {
     e.preventDefault(); 
     try {
-      const response = await axios.post('http://192.168.19.50:3001/login', { login, password });
-      setToken(response.data.token);
-      await localStorage.setItem('token', response.data.token);
+      const response = await axios.post('http://192.168.19.117:3001/login', { login, pwd });
+      setToken(response.data);
+      await localStorage.setItem('token', response.data);
     } catch (error) {
       console.error('Ошибка при авторизации:', error);
       alert('Неверный логин или пароль');
@@ -50,7 +50,7 @@ function Login (){
           <input
             type="password"
             id="password"
-            value={password}
+            value={pwd}
             onChange={(e) => setPassword(e.target.value)}
             required
           />

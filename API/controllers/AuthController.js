@@ -1,22 +1,28 @@
 import AuthService from "../services/AuthService.js";
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'
 
 class AuthController{
-
     
-    async login(req,res){
-
-        const SECRET_KEY = 'your_secret_key';
+    static async login(req,res){
+        const{login,pwd} = req.body;
         try{
-            const{login,password} = req.body;
-            const date = await AuthService.login(login,password)
-            const token = await jwt.sign({ userId: date.id, username: date.username }, SECRET_KEY, { expiresIn: '1h' });
-            res.json({token});
+            if (!login || !pwd) {
+                return res.status(400).json({ error: 'Заполни логин и пароль' });
+            }
+
+            const user = await AuthService.login(login,pwd)
+
+            const token = jwt.sign(
+            user,
+            process.env.JWT_SECRET,
+            { expiresIn: process.env.JWT_EXPIRES_IN || '24h' });
+
+            res.json(token)
         }
         catch(e){
-            res.status(500).json("erro");
+            console.error('Login error:', e);
+            res.status(401).json({ error: "Invalid credentials" }); 
         }
     }
 }
-
-export default new AuthController();
+export default AuthController;
