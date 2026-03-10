@@ -1,0 +1,75 @@
+services:
+  mysql:
+    image: mariadb:10.11
+    container_name: des_boock_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Asdfg123 # Используем тот же пароль, что в логах
+      MYSQL_DATABASE: des_boock
+      MYSQL_USER: des_user
+      MYSQL_PASSWORD: des_password
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - des_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-pAsdfg123",
+        ]
+      timeout: 10s
+      retries: 10
+      interval: 5s
+      start_period: 30s
+
+  api:
+    build: ./API
+    container_name: des_boock_api
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      PORT: 3001
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: des_boock
+      DB_USER: root # Временно используем root для теста
+      DB_PASSWORD: Asdfg123
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - ./API:/app
+      - /app/node_modules
+    networks:
+      - des_network
+
+  ui:
+    build: ./UI
+    container_name: des_boock_ui
+    restart: unless-stopped
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+    environment:
+      REACT_APP_API_URL: http://localhost:3001/api
+    networks:
+      - des_network
+
+networks:
+  des_network:
+    driver: bridge
+
+volumes:
+  db_data:

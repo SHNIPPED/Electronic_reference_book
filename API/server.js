@@ -23,10 +23,10 @@ const corsOptions = {
 
 app.use(cors(corsOptions))
 
-app.listen(3001, error => {
-  error ? console.log(error) : console.log(`Слушается порт ${3001}`);
-});
-
 app.use('/PhoneBook', phoneBookRoutes);
 app.use(hostsRoutes)
 app.use(AuthRouter);
+
+app.listen(3001, error => {
+  error ? console.log(error) : console.log(`Слушается порт ${3001}`);
+});
