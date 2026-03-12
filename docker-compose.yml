@@ -4,7 +4,7 @@ services:
     container_name: des_boock_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: Asdfg123 # Используем тот же пароль, что в логах
+      MYSQL_ROOT_PASSWORD: Asdfg123 
       MYSQL_DATABASE: des_boock
       MYSQL_USER: des_user
       MYSQL_PASSWORD: des_password
@@ -43,7 +43,7 @@ services:
       DB_HOST: mysql
       DB_PORT: 3306
       DB_NAME: des_boock
-      DB_USER: root # Временно используем root для теста
+      DB_USER: root 
       DB_PASSWORD: Asdfg123
     depends_on:
       mysql:
