@@ -12,6 +12,8 @@ function Hosts() {
   const [hosts, setHosts] = useState([]);
   const navigate = useNavigate();
 
+  const baseURL = process.env.REACT_APP_API_URL || '/api/';
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -21,7 +23,7 @@ function Hosts() {
 
   const fetchData = async () =>{
     try {
-        const response = await axios.get("http://192.168.19.117:3001/");
+        const response = await axios.get(baseURL);
         
         if (response.data && response.data.hosts) {
             setHosts(response.data.hosts);
@@ -55,13 +57,13 @@ function Hosts() {
         if (editingUser) {
             console.log(userData)
             response = await axios.post(
-                `http://192.168.19.117:3001/edit/${editingUser.id}`,
+                `${baseURL}edit/${editingUser.id}`,
                 userData
                
             );
         } else {
             response = await axios.post(
-                `http://192.168.19.117:3001//create`,
+                `${baseURL}create`,
                 userData
             );
         }
@@ -84,7 +86,7 @@ function Hosts() {
 
   const handleDelete = async (id) => {
     try {
-        const response = await axios.delete(`http://192.168.19.117:3001/delete/${id}`);
+        const response = await axios.delete(`${baseURL}delete/${id}`);
         
         alert(response.data.message);
         fetchData();

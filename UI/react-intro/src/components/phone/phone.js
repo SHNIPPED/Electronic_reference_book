@@ -16,9 +16,11 @@ function Phone(){
     const [editingUser, setEditingUser] = useState(null);
     const navigate = useNavigate();
 
+    const baseURL = process.env.REACT_APP_API_URL || '/api/';
+
     const fetchData = async () => {
         try {
-            const response = await axios.get("http://192.168.19.117:3001/PhoneBook");
+            const response = await axios.get(`${baseURL}PhoneBook`);
             
             if (response.data && response.data.phoneBooks) {
                 sortPeople(response.data.phoneBooks);
@@ -63,13 +65,13 @@ function Phone(){
             if (editingUser) {
                 console.log(userData)
                 response = await axios.post(
-                    `http://192.168.19.117:3001/PhoneBook/edit/${editingUser.id}`,
+                    `${baseURL}PhoneBook/edit/${editingUser.id}`,
                     userData
                    
                 );
             } else {
                 response = await axios.post(
-                    `http://192.168.19.117:3001/PhoneBook/create`,
+                    `${baseURL}PhoneBook/create`,
                     userData
                 );
             }
@@ -95,7 +97,7 @@ function Phone(){
     
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`http://192.168.19.117:3001/PhoneBook/delete/${id}`);
+            const response = await axios.delete(`${baseURL}PhoneBook/delete/${id}`);
             
             alert(response.data.message);
             fetchData();

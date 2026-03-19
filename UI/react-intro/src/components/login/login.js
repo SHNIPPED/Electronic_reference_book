@@ -7,10 +7,12 @@ function Login (){
   const [pwd, setPassword] = useState('');
   const [token, setToken] = useState('');
 
+  const baseURL = process.env.REACT_APP_API_URL || '/api/';
+
   const handleLogin = async (e) => {
     e.preventDefault(); 
     try {
-      const response = await axios.post('http://192.168.19.117:3001/login', { login, pwd });
+      const response = await axios.post(`${baseURL}login`, { login, pwd });
       setToken(response.data);
       await localStorage.setItem('token', response.data);
     } catch (error) {

@@ -1,75 +1,73 @@
 services:
-  mysql:
+  mariadb:
     image: mariadb:10.11
-    container_name: des_boock_db
+    container_name: mariadb_api
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: Asdfg123 
-      MYSQL_DATABASE: des_boock
-      MYSQL_USER: des_user
-      MYSQL_PASSWORD: des_password
+      MYSQL_ROOT_PASSWORD: Asdfg123
+      MYSQL_DATABASE: des
+      MYSQL_USER: des
+      MYSQL_PASSWORD: Asdfg123
+      MYSQL_SSL: "false"
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql
+      - mariadb_data:/var/lib/mysql
+      - ./des_backup.sql:/docker-entrypoint-initdb.d/des_backup.sql
     networks:
-      - des_network
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-pAsdfg123",
-        ]
-      timeout: 10s
-      retries: 10
-      interval: 5s
-      start_period: 30s
-
-  api:
-    build: ./API
-    container_name: des_boock_api
-    restart: unless-stopped
-    ports:
-      - "3001:3001"
-    environment:
-      NODE_ENV: development
-      PORT: 3001
-      DB_HOST: mysql
-      DB_PORT: 3306
-      DB_NAME: des_boock
-      DB_USER: root 
-      DB_PASSWORD: Asdfg123
-    depends_on:
-      mysql:
-        condition: service_healthy
-    volumes:
-      - ./API:/app
-      - /app/node_modules
-    networks:
-      - des_network
+      - api_network
 
   ui:
-    build: ./UI
-    container_name: des_boock_ui
+    build:
+      context: ./UI/react-intro
+      dockerfile: Dockerfile
+    container_name: des_ui
     restart: unless-stopped
-    ports:
-      - "3000:80"
+    # ports:
+    #   - "3000:80"
     depends_on:
       - api
-    environment:
-      REACT_APP_API_URL: http://localhost:3001/api
     networks:
-      - des_network
+      - api_network
+    environment:
+      - REACT_APP_API_URL=/api
+
+  api:
+    build:
+      context: ./API
+      dockerfile: Dockerfile
+    container_name: des_api
+    restart: unless-stopped
+    # ports:
+    #   - "3001:3001"
+    environment:
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_USER: des
+      DB_PASSWORD: Asdfg123
+      DB_NAME: des
+    depends_on:
+      - mariadb
+    networks:
+      - api_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: des_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - api
+      - ui
+    networks:
+      - api_network
 
 networks:
-  des_network:
+  api_network:
     driver: bridge
 
 volumes:
-  db_data:
+  mariadb_data:
