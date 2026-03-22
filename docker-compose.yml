@@ -11,6 +11,12 @@ services:
       MYSQL_SSL: "false"
     ports:
       - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-pAsdfg123"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
     volumes:
       - mariadb_data:/var/lib/mysql
       - ./des_backup.sql:/docker-entrypoint-initdb.d/des_backup.sql
@@ -47,7 +53,8 @@ services:
       DB_PASSWORD: Asdfg123
       DB_NAME: des
     depends_on:
-      - mariadb
+      mariadb:
+        
     networks:
       - api_network
 
