@@ -8,6 +8,7 @@ import Login from './components/login/login'
 import SnakeGame from './components/snake/Snake'
 import error from './components/error/error';
 import removal from './removal/removal';
+import Summary from './components/summary/summary';
 
 function App () {
   
@@ -22,6 +23,7 @@ function App () {
           <Route path='/Error' Component={error} />
           <Route path='/Removal' Component={removal} />
           <Route path='/Phone' Component={Phone} />
+          <Route path='/Summary' Component={Summary} />
         </Routes>
       </BrowserRouter>
   );
