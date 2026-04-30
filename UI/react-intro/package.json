@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "ag-grid-community": "^35.2.1",
+    "ag-grid-react": "^35.2.1",
     "axios": "^1.8.1",
     "cra-template": "1.2.0",
     "jsonwebtoken": "^9.0.2",

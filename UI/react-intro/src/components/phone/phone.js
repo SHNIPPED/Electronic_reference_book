@@ -16,7 +16,7 @@ function Phone(){
     const [editingUser, setEditingUser] = useState(null);
     const navigate = useNavigate();
 
-    const baseURL = process.env.REACT_APP_API_URL || '/api/';
+    const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
     const fetchData = async () => {
         try {

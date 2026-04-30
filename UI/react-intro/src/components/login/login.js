@@ -7,7 +7,7 @@ function Login (){
   const [pwd, setPassword] = useState('');
   const [token, setToken] = useState('');
 
-  const baseURL = process.env.REACT_APP_API_URL || '/api/';
+  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
   const handleLogin = async (e) => {
     e.preventDefault(); 

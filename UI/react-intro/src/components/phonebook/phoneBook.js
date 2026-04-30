@@ -12,7 +12,7 @@ function PhoneBook(){
     const [searchItem, setSearchItem] =  React.useState('')
     const [groupedPhone, setGroupedPhone] = useState({});
 
-    const baseURL = process.env.REACT_APP_API_URL || '/api/';
+    const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
     useEffect(() => {
         const fetchData = async () =>{

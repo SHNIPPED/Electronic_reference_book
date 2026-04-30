@@ -12,7 +12,7 @@ function Hosts() {
   const [hosts, setHosts] = useState([]);
   const navigate = useNavigate();
 
-  const baseURL = process.env.REACT_APP_API_URL || '/api/';
+  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
   useEffect(() => {
     const token = localStorage.getItem("token");
