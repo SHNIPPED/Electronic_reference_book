@@ -1,0 +1,85 @@
+.execution-container {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.execution-toolbar {
+  padding: 10px;
+  background-color: #f3f4f6;
+  border-bottom: 1px solid #ccc;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.execution-btn {
+  padding: 6px 12px;
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.execution-btn-add {
+  background-color: #4CAF50;
+  color: white;
+}
+
+.execution-btn-add:hover {
+  background-color: #45a049;
+}
+
+.execution-btn-delete {
+  background-color: #f44336;
+  color: white;
+}
+
+.execution-btn-delete:hover {
+  background-color: #da190b;
+}
+
+.execution-btn-refresh {
+  background-color: #2196F3;
+  color: white;
+}
+
+.execution-btn-refresh:hover {
+  background-color: #0b7dda;
+}
+
+.execution-grid-container {
+  flex: 1;
+  width: 100%;
+}
+
+.execution-loading, .execution-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  flex-direction: column;
+}
+
+.execution-error-message {
+  color: #f44336;
+  margin-bottom: 10px;
+  font-size: 16px;
+}
+
+.execution-error-btn {
+  padding: 8px 16px;
+  background-color: #2196F3;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.ag-theme-alpine .ag-row-group {
+  font-weight: bold;
+  background-color: #f5f5f5;
+}

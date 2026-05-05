@@ -9,6 +9,8 @@ import SnakeGame from './components/snake/Snake'
 import error from './components/error/error';
 import removal from './removal/removal';
 import Summary from './components/summary/summary';
+import execution from './components/execution/execution';
+
 
 function App () {
   
@@ -24,6 +26,7 @@ function App () {
           <Route path='/Removal' Component={removal} />
           <Route path='/Phone' Component={Phone} />
           <Route path='/Summary' Component={Summary} />
+          <Route path='/Execution' Component={execution} />
         </Routes>
       </BrowserRouter>
   );
