@@ -39,7 +39,6 @@ function Execution() {
   const [error, setError] = useState(null);
   const [rowData, setRowData] = useState([]);
 
-  // Столбцы по требованиям
   const [columnDefs] = useState([
     { 
       headerName: 'Бюджет', 
@@ -268,7 +267,7 @@ function Execution() {
     { 
       headerName: 'Выплаты 3 год', 
       field: 'payment_year3', 
-      width: 160,
+      width: 150,
       editable: true,
       valueFormatter: formatNumber,
       valueSetter: (params) => {
@@ -313,10 +312,9 @@ function Execution() {
     },
   ]);
 
-  // Колонки для группировки
   const [autoGroupColumnDef] = useState({
     headerName: 'Группировка',
-    field: 'group',
+    field: 'group', 
     width: 250,
     pinned: 'left',
     cellRenderer: 'agGroupCellRenderer',
@@ -326,7 +324,7 @@ function Execution() {
     editable: false,
   });
 
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
+  const baseURL = process.env.REACT_APP_API_URL || 'http://192.168.19.101:3001/';
 
   const api = axios.create({
     baseURL: baseURL,
@@ -335,16 +333,17 @@ function Execution() {
     },
   });
 
-  // Загрузка данных
+  // Загрузка данных - соответствует GET /
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await api.get('Execution');
+      const response = await api.get('execution/'); // GET /execution/
       
+      // API возвращает { executions: [...] }
       let data = [];
-      if (response.data && response.data.documents && Array.isArray(response.data.documents)) {
-        data = response.data.documents;
+      if (response.data && response.data.executions && Array.isArray(response.data.executions)) {
+        data = response.data.executions;
       } else if (Array.isArray(response.data)) {
         data = response.data;
       }
@@ -372,16 +371,32 @@ function Execution() {
     
     const updatedRow = { ...data, [colDef.field]: newValue };
     
+    // Оптимистичное обновление UI
     setRowData(prevData => prevData.map(item => 
       item.id === data.id ? updatedRow : item
     ));
     
     try {
-      await api.post(`Execution/edit/${data.id}`, updatedRow);
-      console.log(`Строка ${data.id} сохранена`);
+      if (data.is_new) {
+        // POST /execution/create
+        const response = await api.post('execution/create', updatedRow);
+        if (response.data && response.data.id) {
+          // Обновляем временный ID на реальный из БД
+          setRowData(prevData => prevData.map(item => 
+            item.id === data.id ? { ...updatedRow, id: response.data.id, is_new: false } : item
+          ));
+          console.log(`Новая запись создана с ID: ${response.data.id}`);
+        }
+      } else {
+        // POST /execution/edit/:id
+        await api.post(`execution/edit/${data.id}`, updatedRow);
+        console.log(`Запись ${data.id} обновлена`);
+      }
     } catch (err) {
-      console.error('Ошибка:', err);
-      alert(`Ошибка: ${err.response?.data?.message || err.message}`);
+      console.error('Ошибка сохранения:', err);
+      const errorMessage = err.response?.data?.message || err.message;
+      alert(`Ошибка сохранения: ${errorMessage}`);
+      // Откатываем изменения
       setRowData(prevData => prevData.map(item => 
         item.id === data.id ? data : item
       ));
@@ -391,7 +406,7 @@ function Execution() {
   // Добавление строки
   const handleAddRow = useCallback(() => {
     const tempId = -Date.now();
-    const currentDate = new Date().toISOString();
+    const currentDate = new Date().toISOString().split('T')[0];
     
     const newRow = { 
       id: tempId,
@@ -442,7 +457,7 @@ function Execution() {
     }, 100);
   }, [rowData.length]);
 
-  // Удаление строк
+  // Удаление строк - DELETE /execution/delete/:id
   const handleDeleteRow = useCallback(async () => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
     if (!selectedNodes?.length) {
@@ -459,19 +474,23 @@ function Execution() {
     const existingRows = selectedRows.filter(row => !row.is_new && !row.__node_type);
     const newRows = selectedRows.filter(row => row.is_new);
     
+    // Удаляем локальные (несохраненные) строки
     if (newRows.length > 0) {
       setRowData(prevData => prevData.filter(row => !newRows.some(r => r.id === row.id)));
     }
     
+    // Удаляем существующие через API
     if (existingRows.length > 0) {
       try {
-        const deletePromises = existingRows.map(row => api.delete(`Execution/delete/${row.id}`));
+        const deletePromises = existingRows.map(row => 
+          api.delete(`execution/delete/${row.id}`)
+        );
         await Promise.all(deletePromises);
-        await fetchData();
+        await fetchData(); // Перезагружаем данные
         alert(`Удалено ${existingRows.length} записей`);
       } catch (err) {
-        console.error('Ошибка:', err);
-        alert('Ошибка при удалении');
+        console.error('Ошибка удаления:', err);
+        alert(`Ошибка при удалении: ${err.response?.data?.message || err.message}`);
       }
     }
   }, [fetchData]);
