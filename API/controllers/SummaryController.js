@@ -5,9 +5,7 @@ class SummaryController{
     static async getAll(req, res) {
         try {
             const contracts = await SummaryModule.getAll();
-            return res.status(200).json({ 
-                contracts
-            });
+            return res.status(200).json({ contracts });
         }
         catch(error) {
             console.error('Ошибка при получении контрактов:', error);
@@ -77,7 +75,6 @@ class SummaryController{
         }
     }
 
-
     static async delete(req, res) {
         try {
             const { id } = req.params;
@@ -102,8 +99,6 @@ class SummaryController{
             return res.status(500).json({ message: 'Ошибка сервера' });
         }
     }
-
-
 }
 
 export default SummaryController;

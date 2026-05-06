@@ -5,9 +5,7 @@ class ExecutionController {
     static async getAll(req, res) {
         try {
             const executions = await ExecutionModule.getAll();
-            return res.status(200).json({ 
-                executions
-            });
+            return res.status(200).json({ executions });
         }
         catch(error) {
             console.error('Ошибка при получении данных исполнения:', error);
@@ -19,12 +17,10 @@ class ExecutionController {
         try {
             const executionData = req.body;
             
-            // Проверка обязательных полей (на основе вашей таблицы)
-            if (!executionData.budget || !executionData.document_status || !executionData.document_number || 
-                !executionData.document_date || !executionData.type || !executionData.institution || 
-                !executionData.founder || !executionData.structure) {
+            if (!executionData.kfsr || !executionData.kcsr || !executionData.kvr || 
+                !executionData.kosgu || !executionData.kvfo) {
                 return res.status(400).json({ 
-                    message: 'Необходимо заполнить все обязательные поля: budget, document_status, document_number, document_date, type, institution, founder, structure' 
+                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo' 
                 });
             }
     
@@ -55,12 +51,10 @@ class ExecutionController {
                 return res.status(400).json({ message: 'Некорректный ID' });
             }
 
-            // Проверка обязательных полей
-            if (!executionData.budget || !executionData.document_status || !executionData.document_number || 
-                !executionData.document_date || !executionData.type || !executionData.institution || 
-                !executionData.founder || !executionData.structure) {
+            if (!executionData.kfsr || !executionData.kcsr || !executionData.kvr || 
+                !executionData.kosgu || !executionData.kvfo) {
                 return res.status(400).json({ 
-                    message: 'Необходимо заполнить все обязательные поля: budget, document_status, document_number, document_date, type, institution, founder, structure' 
+                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo' 
                 });
             }
 

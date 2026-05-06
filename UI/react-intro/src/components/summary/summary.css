@@ -111,3 +111,11 @@
     transform: translateY(-50%);
     animation: spin 1s linear infinite;
   }
+  .summary-btn-nav {
+    background-color: #3498db;
+    margin-left: auto;
+  }
+  
+  .summary-btn-nav:hover {
+    background-color: #2980b9;
+  }
