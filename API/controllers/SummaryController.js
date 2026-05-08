@@ -17,6 +17,7 @@ class SummaryController{
         try {
             const summaryData = req.body;
             
+            // Проверка обязательных полей (КОСГУ не обязательный)
             if (!summaryData.doc_num || !summaryData.doc_status || !summaryData.doc_date || 
                 !summaryData.total_sum || !summaryData.counterparty || !summaryData.end_date) {
                 return res.status(400).json({ 
@@ -51,10 +52,11 @@ class SummaryController{
                 return res.status(400).json({ message: 'Некорректный ID' });
             }
 
+            // Проверка обязательных полей
             if (!summaryData.doc_num || !summaryData.doc_status || !summaryData.doc_date || 
                 !summaryData.total_sum || !summaryData.counterparty || !summaryData.end_date) {
                 return res.status(400).json({ 
-                    message: 'Необходимо заполнить все обязательные поля' 
+                    message: 'Необходимо заполнить все обязательные поля: doc_num, doc_status, doc_date, total_sum, counterparty, end_date' 
                 });
             }
 

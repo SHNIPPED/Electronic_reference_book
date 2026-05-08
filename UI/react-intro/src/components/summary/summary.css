@@ -117,5 +117,13 @@
   }
   
   .summary-btn-nav:hover {
-    background-color: #2980b9;
+    background-color: #8e44ad;
+  }
+
+  .summary-btn-import {
+    background-color: #7d3c98;
+  }
+  
+  .summary-btn-import:hover {
+    background-color: #45a049;
   }

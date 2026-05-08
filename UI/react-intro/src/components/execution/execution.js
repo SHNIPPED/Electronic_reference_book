@@ -362,13 +362,13 @@ function Execution() {
         <input
           ref={fileInputRef}
           type="file"
-          accept=".xlt"
+          accept=".xlsx,.xls,.xlt,.xltx"
           style={{ display: 'none' }}
           onChange={handleImport}
         />
         {savingRows.size > 0 && <span className="execution-saving-indicator">Сохранение...</span>}
         <button className="execution-btn execution-btn-nav" onClick={() => navigate("/summary")}>
-          К сводным данным
+          Перейти к договорам 
         </button>
       </div>
 

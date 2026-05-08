@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from "react-router-dom";
 import { AgGridReact } from 'ag-grid-react';
 import axios from 'axios';
+import SummaryExcelService from './summaryExcelService';
 
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -108,202 +109,38 @@ class SimpleTextEditor {
 
 function Summary() {
   const gridRef = useRef();
+  const fileInputRef = useRef();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savingRows, setSavingRows] = useState(new Set());
   const navigate = useNavigate();
 
   const [columnDefs] = useState([
-    { 
-      headerName: 'Номер документа', 
-      field: 'doc_num', 
-      width: 180, 
-      pinned: 'left',
-      checkboxSelection: true,
-      headerCheckboxSelection: true,
-      editable: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'Статус документа', 
-      field: 'doc_status', 
-      width: 150, 
-      editable: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата документа', 
-      field: 'doc_date', 
-      width: 140, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата регистрации', 
-      field: 'reg_date', 
-      width: 150, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата исполнения', 
-      field: 'exec_date', 
-      width: 150, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Общая сумма', 
-      field: 'total_sum', 
-      width: 150, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Организация контрагента', 
-      field: 'counterparty', 
-      width: 300, 
-      editable: true, 
-      wrapText: true, 
-      autoHeight: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'Сумма контракта', 
-      field: 'contract_sum', 
-      width: 160, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Сумма тек. года', 
-      field: 'curr_year_sum', 
-      width: 150, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Исполнено в тек. году', 
-      field: 'exec_curr_year', 
-      width: 180, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Исполнено в прошлых периодах', 
-      field: 'exec_past_periods', 
-      width: 220, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'В исполнении', 
-      field: 'in_execution', 
-      width: 140, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Сумма аванса', 
-      field: 'advance_sum', 
-      width: 140, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Остаток', 
-      field: 'balance', 
-      width: 130, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Общий остаток', 
-      field: 'total_balance', 
-      width: 150, 
-      editable: true, 
-      valueFormatter: formatNumber,
-      cellDataType: 'number', 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата документа-основания', 
-      field: 'base_doc_date', 
-      width: 200, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата начала действия', 
-      field: 'start_date', 
-      width: 180, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Дата окончания действия', 
-      field: 'end_date', 
-      width: 190, 
-      editable: true, 
-      cellEditor: SimpleTextEditor,
-      valueFormatter: (params) => formatDate(params.value), 
-      resizable: true 
-    },
-    { 
-      headerName: 'Основание', 
-      field: 'osnovanie', 
-      width: 200, 
-      editable: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'КЦСР', 
-      field: 'kcsr', 
-      width: 120, 
-      editable: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'КВР', 
-      field: 'kvr', 
-      width: 120, 
-      editable: true, 
-      resizable: true 
-    },
-    { 
-      headerName: 'КВФО', 
-      field: 'kvfo', 
-      width: 120, 
-      editable: true, 
-      resizable: true 
-    }
-  ]);
+    { headerName: 'Номер документа', field: 'doc_num', width: 180, pinned: 'left', checkboxSelection: true, headerCheckboxSelection: true, editable: true, resizable: true },
+    { headerName: 'Статус документа', field: 'doc_status', width: 150, editable: true, resizable: true },
+    { headerName: 'Дата документа', field: 'doc_date', width: 140, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Дата регистрации', field: 'reg_date', width: 150, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Дата исполнения', field: 'exec_date', width: 150, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Общая сумма', field: 'total_sum', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Признак договора', field: 'contract_type', width: 160, editable: true, resizable: true },
+    { headerName: 'Организация контрагента', field: 'counterparty', width: 350, editable: true, wrapText: true, autoHeight: true, resizable: true },
+    { headerName: 'Сумма контракта', field: 'contract_sum', width: 160, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Сумма тек. года', field: 'curr_year_sum', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Исполнено в тек. году', field: 'exec_curr_year', width: 180, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Исполнено в прошлых периодах', field: 'exec_past_periods', width: 220, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'В исполнении', field: 'in_execution', width: 140, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Сумма аванса', field: 'advance_sum', width: 140, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Остаток', field: 'balance', width: 130, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Общий остаток', field: 'total_balance', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    { headerName: 'Дата документа-основания', field: 'base_doc_date', width: 200, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Дата начала действия', field: 'start_date', width: 180, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Дата окончания действия', field: 'end_date', width: 190, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
+    { headerName: 'Основание', field: 'osnovanie', width: 300, editable: true, wrapText: true, autoHeight: true, resizable: true },
+    { headerName: 'КЦСР', field: 'kcsr', width: 120, editable: true, resizable: true },
+    { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
+    { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true },  // Новая колонка
+    { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true }
+]);
 
   const [rowData, setRowData] = useState([]);
 
@@ -339,118 +176,151 @@ function Summary() {
     fetchData();
   }, [fetchData]);
 
+  // Импорт из Excel
+  const handleImport = useCallback(async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    setLoading(true);
+
+    try {
+      const results = await SummaryExcelService.importFromExcel(file, api);
+      
+      await fetchData();
+
+      let message = `Импорт завершен!\n`;
+      message += `Добавлено: ${results.added}\n`;
+      message += `Обновлено: ${results.updated}\n`;
+      if (results.errors.length > 0) {
+        message += `Ошибок: ${results.errors.length}`;
+      }
+      alert(message);
+
+    } catch (error) {
+      console.error('Ошибка импорта:', error);
+      alert(`Ошибка при импорте: ${error.message}`);
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  }, [fetchData]);
+
   const saveToDatabase = useCallback(async (row) => {
     if (savingRows.has(row.id)) return false;
     setSavingRows(prev => new Set(prev).add(row.id));
     
     try {
-      const formatDateForMySQL = (date) => {
-        if (!date) return null;
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return null;
-        return d.toISOString().split('T')[0];
-      };
-      
-      const dataToSend = {
-        doc_num: row.doc_num,
-        doc_status: row.doc_status,
-        doc_date: formatDateForMySQL(row.doc_date),
-        reg_date: formatDateForMySQL(row.reg_date),
-        exec_date: formatDateForMySQL(row.exec_date),
-        total_sum: Number(row.total_sum) || 0,
-        counterparty: row.counterparty || '',
-        contract_sum: Number(row.contract_sum) || 0,
-        curr_year_sum: Number(row.curr_year_sum) || 0,
-        exec_curr_year: Number(row.exec_curr_year) || 0,
-        exec_past_periods: Number(row.exec_past_periods) || 0,
-        in_execution: Number(row.in_execution) || 0,
-        advance_sum: Number(row.advance_sum) || 0,
-        balance: Number(row.balance) || 0,
-        total_balance: Number(row.total_balance) || 0,
-        base_doc_date: formatDateForMySQL(row.base_doc_date),
-        start_date: formatDateForMySQL(row.start_date),
-        end_date: formatDateForMySQL(row.end_date),
-        osnovanie: row.osnovanie || '',
-        kcsr: row.kcsr || '',
-        kvr: row.kvr || '',
-        kvfo: row.kvfo || ''
-      };
-      
-      await api.post(`Summary/edit/${row.id}`, dataToSend);
-      return true;
+        const formatDateForMySQL = (date) => {
+            if (!date) return null;
+            const d = new Date(date);
+            if (isNaN(d.getTime())) return null;
+            return d.toISOString().split('T')[0];
+        };
+        
+        const dataToSend = {
+            doc_num: row.doc_num,
+            doc_status: row.doc_status,
+            doc_date: formatDateForMySQL(row.doc_date),
+            reg_date: formatDateForMySQL(row.reg_date),
+            exec_date: formatDateForMySQL(row.exec_date),
+            total_sum: Number(row.total_sum) || 0,
+            contract_type: row.contract_type || '',
+            counterparty: row.counterparty || '',
+            contract_sum: Number(row.contract_sum) || 0,
+            curr_year_sum: Number(row.curr_year_sum) || 0,
+            exec_curr_year: Number(row.exec_curr_year) || 0,
+            exec_past_periods: Number(row.exec_past_periods) || 0,
+            in_execution: Number(row.in_execution) || 0,
+            advance_sum: Number(row.advance_sum) || 0,
+            balance: Number(row.balance) || 0,
+            total_balance: Number(row.total_balance) || 0,
+            base_doc_date: formatDateForMySQL(row.base_doc_date),
+            start_date: formatDateForMySQL(row.start_date),
+            end_date: formatDateForMySQL(row.end_date),
+            osnovanie: row.osnovanie || '',
+            kcsr: row.kcsr || '',
+            kvr: row.kvr || '',
+            kosgu: row.kosgu || '',  // Добавлено
+            kvfo: row.kvfo || ''
+        };
+        
+        await api.post(`Summary/edit/${row.id}`, dataToSend);
+        return true;
     } catch (err) {
-      console.error('Ошибка сохранения:', err);
-      alert(`Ошибка: ${err.response?.data?.message || err.message}`);
-      return false;
+        console.error('Ошибка сохранения:', err);
+        alert(`Ошибка: ${err.response?.data?.message || err.message}`);
+        return false;
     } finally {
-      setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
+        setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
     }
-  }, []);
+}, []);
 
-  const saveNewRowToDB = useCallback(async (row) => {
-    if (!row.is_new) return true;
-    
-    if (!row.doc_num || !row.doc_num.trim()) {
+const saveNewRowToDB = useCallback(async (row) => {
+  if (!row.is_new) return true;
+  
+  if (!row.doc_num || !row.doc_num.trim()) {
       alert('Заполните номер документа');
       return false;
-    }
-    
-    try {
+  }
+  
+  try {
       const formatDateForMySQL = (date) => {
-        if (!date) return null;
-        const d = new Date(date);
-        if (isNaN(d.getTime())) return null;
-        return d.toISOString().split('T')[0];
+          if (!date) return null;
+          const d = new Date(date);
+          if (isNaN(d.getTime())) return null;
+          return d.toISOString().split('T')[0];
       };
       
       const currentDate = formatDateForMySQL(new Date());
-      const nextYearDate = new Date();
-      nextYearDate.setFullYear(nextYearDate.getFullYear() + 1);
       
       const dataToSend = {
-        doc_num: row.doc_num?.trim(),
-        doc_status: row.doc_status || 'Черновик',
-        doc_date: formatDateForMySQL(row.doc_date) || currentDate,
-        reg_date: formatDateForMySQL(row.reg_date),
-        exec_date: formatDateForMySQL(row.exec_date),
-        total_sum: Number(row.total_sum) || 0,
-        counterparty: row.counterparty || '',
-        contract_sum: Number(row.contract_sum) || 0,
-        curr_year_sum: Number(row.curr_year_sum) || 0,
-        exec_curr_year: Number(row.exec_curr_year) || 0,
-        exec_past_periods: Number(row.exec_past_periods) || 0,
-        in_execution: Number(row.in_execution) || 0,
-        advance_sum: Number(row.advance_sum) || 0,
-        balance: Number(row.balance) || 0,
-        total_balance: Number(row.total_balance) || 0,
-        base_doc_date: formatDateForMySQL(row.base_doc_date),
-        start_date: formatDateForMySQL(row.start_date) || currentDate,
-        end_date: formatDateForMySQL(row.end_date) || nextYearDate.toISOString().split('T')[0],
-        osnovanie: row.osnovanie || '',
-        kcsr: row.kcsr || '',
-        kvr: row.kvr || '',
-        kvfo: row.kvfo || ''
+          doc_num: row.doc_num?.trim(),
+          doc_status: row.doc_status || 'Черновик',
+          doc_date: formatDateForMySQL(row.doc_date) || currentDate,
+          reg_date: formatDateForMySQL(row.reg_date),
+          exec_date: formatDateForMySQL(row.exec_date),
+          total_sum: Number(row.total_sum) || 0,
+          contract_type: row.contract_type || '',
+          counterparty: row.counterparty || '',
+          contract_sum: Number(row.contract_sum) || 0,
+          curr_year_sum: Number(row.curr_year_sum) || 0,
+          exec_curr_year: Number(row.exec_curr_year) || 0,
+          exec_past_periods: Number(row.exec_past_periods) || 0,
+          in_execution: Number(row.in_execution) || 0,
+          advance_sum: Number(row.advance_sum) || 0,
+          balance: Number(row.balance) || 0,
+          total_balance: Number(row.total_balance) || 0,
+          base_doc_date: formatDateForMySQL(row.base_doc_date),
+          start_date: formatDateForMySQL(row.start_date) || currentDate,
+          end_date: formatDateForMySQL(row.end_date),
+          osnovanie: row.osnovanie || '',
+          kcsr: row.kcsr || '',
+          kvr: row.kvr || '',
+          kosgu: row.kosgu || '',  // Добавлено
+          kvfo: row.kvfo || ''
       };
           
       const response = await api.post('Summary/create', dataToSend);
       
       if (response.data && response.data.id) {
-        setRowData(prevData => prevData.map(item => {
-          if (item.id === row.id) {
-            return { ...row, id: response.data.id, is_new: false };
-          }
-          return item;
-        }));
-        return true;
+          setRowData(prevData => prevData.map(item => {
+              if (item.id === row.id) {
+                  return { ...row, id: response.data.id, is_new: false };
+              }
+              return item;
+          }));
+          return true;
       }
       return false;
-    } catch (err) {
+  } catch (err) {
       console.error('Ошибка:', err);
       alert(`Ошибка сервера: ${err.response?.data?.message || err.message}`);
       setRowData(prevData => prevData.filter(item => item.id !== row.id));
       return false;
-    }
-  }, []);
+  }
+}, []);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;
@@ -478,44 +348,46 @@ function Summary() {
     const currentDate = new Date().toISOString();
     
     const newRow = { 
-      id: tempId,
-      is_new: true,
-      doc_num: '',
-      doc_status: 'Черновик',
-      doc_date: currentDate,
-      reg_date: null,
-      exec_date: null,
-      total_sum: 0,
-      counterparty: '',
-      contract_sum: 0,
-      curr_year_sum: 0,
-      exec_curr_year: 0,
-      exec_past_periods: 0,
-      in_execution: 0,
-      advance_sum: 0,
-      balance: 0,
-      total_balance: 0,
-      base_doc_date: null,
-      start_date: currentDate,
-      end_date: null,
-      osnovanie: '',
-      kcsr: '',
-      kvr: '',
-      kvfo: ''
+        id: tempId,
+        is_new: true,
+        doc_num: '',
+        doc_status: 'Черновик',
+        doc_date: currentDate,
+        reg_date: null,
+        exec_date: null,
+        total_sum: 0,
+        contract_type: '',
+        counterparty: '',
+        contract_sum: 0,
+        curr_year_sum: 0,
+        exec_curr_year: 0,
+        exec_past_periods: 0,
+        in_execution: 0,
+        advance_sum: 0,
+        balance: 0,
+        total_balance: 0,
+        base_doc_date: null,
+        start_date: currentDate,
+        end_date: null,
+        osnovanie: '',
+        kcsr: '',
+        kvr: '',
+        kosgu: '', 
+        kvfo: ''
     };
     
     setRowData(prevData => [...prevData, newRow]);
     
     setTimeout(() => {
-      if (gridRef.current) {
-        const newRowIndex = rowData.length;
-        gridRef.current.api.ensureIndexVisible(newRowIndex, 'bottom');
-        setTimeout(() => {
-          gridRef.current.api.startEditingCell({ rowIndex: newRowIndex, colKey: 'doc_num' });
-        }, 100);
-      }
+        if (gridRef.current) {
+            const newRowIndex = rowData.length;
+            gridRef.current.api.ensureIndexVisible(newRowIndex, 'bottom');
+            setTimeout(() => {
+                gridRef.current.api.startEditingCell({ rowIndex: newRowIndex, colKey: 'doc_num' });
+            }, 100);
+        }
     }, 100);
-  }, [rowData.length]);
+}, [rowData.length]);
 
   const handleDeleteRow = useCallback(async () => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
@@ -575,8 +447,20 @@ function Summary() {
         <button onClick={handleAddRow} className="summary-btn summary-btn-add">+ Добавить строку</button>
         <button onClick={handleDeleteRow} className="summary-btn summary-btn-delete">- Удалить выбранные</button>
         <button onClick={fetchData} className="summary-btn summary-btn-refresh">Обновить</button>
+        <button onClick={() => fileInputRef.current.click()} className="summary-btn summary-btn-import">
+          Загрузить из Excel
+        </button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".xlsx,.xls,.xlt,.xltx"
+          style={{ display: 'none' }}
+          onChange={handleImport}
+        />
         {savingRows.size > 0 && <span className="summary-saving-indicator">Сохранение...</span>}
-        <button className="execution-btn execution-btn-add" onClick={() => navigate("/Execution")}>Перейти к ПФХД →</button>
+        <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>
+          Перейти к ПФХД
+        </button>
       </div>
 
       <div className="summary-grid-container ag-theme-alpine">
