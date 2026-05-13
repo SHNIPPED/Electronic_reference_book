@@ -10,6 +10,7 @@ import error from './components/error/error';
 import removal from './removal/removal';
 import Summary from './components/summary/summary';
 import execution from './components/execution/execution';
+import BudgetPlan from './components/budgetPlan/BudgetPlan';
 
 
 function App () {
@@ -27,6 +28,7 @@ function App () {
           <Route path='/Phone' Component={Phone} />
           <Route path='/Summary' Component={Summary} />
           <Route path='/Execution' Component={execution} />
+          <Route path='/BudgetPlan' Component={BudgetPlan} />
         </Routes>
       </BrowserRouter>
   );

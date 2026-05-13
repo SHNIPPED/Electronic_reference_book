@@ -8,6 +8,7 @@ import phoneBookRoutes from './routes/phoneBookRoutes.js';
 import hostsRoutes from './routes/HostsRoutes.js'
 import SummaryRouter from './routes/SummaryRouter.js';
 import ExecutionRouter from './routes/ExecutionRouter.js'
+import budgetReportRoutes from './routes/budgetReportRoutes.js';
 
 dotenv.config();
 const app = express();
@@ -30,6 +31,7 @@ app.use(hostsRoutes)
 app.use(AuthRouter);
 app.use('/Summary',SummaryRouter)
 app.use('/Execution',ExecutionRouter)
+app.use('/budget-report', budgetReportRoutes);
 
 app.listen(3001, error => {
   error ? console.log(error) : console.log(`Слушается порт ${3001}`);
