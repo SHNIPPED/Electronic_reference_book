@@ -3,6 +3,7 @@ import BudgetReportController from '../controllers/BudgetReportController.js';
 
 const router = express.Router();
 
-router.get('/consolidated', BudgetReportController.getCombinedReport);
+router.get('/hierarchical', BudgetReportController.getHierarchicalReport);
+router.get('/export-excel', BudgetReportController.exportReportToExcel);
 
 export default router;
