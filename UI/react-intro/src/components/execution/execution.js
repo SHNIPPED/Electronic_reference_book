@@ -370,6 +370,9 @@ function Execution() {
         <button className="execution-btn execution-btn-nav" onClick={() => navigate("/summary")}>
           Перейти к договорам 
         </button>
+        <button className="execution-btn execution-btn-nav" onClick={() => navigate("/BudgetPlan")}>
+          Перейти к отчетам
+        </button>
       </div>
 
       <div className="execution-grid-container ag-theme-alpine">

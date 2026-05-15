@@ -138,7 +138,7 @@ function Summary() {
     { headerName: 'Основание', field: 'osnovanie', width: 300, editable: true, wrapText: true, autoHeight: true, resizable: true },
     { headerName: 'КЦСР', field: 'kcsr', width: 120, editable: true, resizable: true },
     { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
-    { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true },  // Новая колонка
+    { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true }, 
     { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true }
 ]);
 
@@ -460,6 +460,9 @@ const saveNewRowToDB = useCallback(async (row) => {
         {savingRows.size > 0 && <span className="summary-saving-indicator">Сохранение...</span>}
         <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>
           Перейти к ПФХД
+        </button>
+        <button className="execution-btn summary-btn-nav" onClick={() => navigate("/BudgetPlan")}>
+          Перейти к отчетам
         </button>
       </div>
 

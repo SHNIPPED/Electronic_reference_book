@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from "react-router-dom"
 import { AgGridReact } from 'ag-grid-react';
 import axios from 'axios';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -25,6 +26,7 @@ const getRowStyle = (params) => {
 function ReportPage() {
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
   const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
   const api = axios.create({ baseURL, headers: { 'Content-Type': 'application/json' } });
 
@@ -61,32 +63,32 @@ function ReportPage() {
   };
 
   const columnDefs = [
-    { field: 'kfsr', headerName: 'КФСР', width: 100 },
-    { field: 'kcsr', headerName: 'КЦСР', width: 150 },
-    { field: 'kcsr_name', headerName: 'Наименование КЦСР', width: 250 },
-    { field: 'kvr', headerName: 'КВР', width: 100 },
-    { field: 'kosgu', headerName: 'КОСГУ', width: 100 },
-    { field: 'kvfo', headerName: 'КВФО', width: 100 },
-    { field: 'counterparty', headerName: 'Организация контрагента', width: 300, wrapText: true },
-    { field: 'doc_date', headerName: 'дата договора', width: 120, valueFormatter: formatDate },
-    { field: 'start_date', headerName: 'начало оказания услуг', width: 150, valueFormatter: formatDate },
+    { field: 'kfsr', headerName: 'КФСР', width: 100 }, //есть 
+    { field: 'kcsr', headerName: 'КЦСР', width: 150 },//есть  (Номер договора)
+    { field: 'kcsr_name', headerName: 'Наименование КЦСР', width: 250 }, //  да  
+    { field: 'kvr', headerName: 'КВР', width: 100 }, // есть 
+    { field: 'kosgu', headerName: 'КОСГУ', width: 100 }, // есть 
+    { field: 'kvfo', headerName: 'КВФО', width: 100 }, // есть 
+    { field: 'counterparty', headerName: 'Организация контрагента', width: 300, wrapText: true }, // вроде да 
+    { field: 'doc_date', headerName: 'дата договора', width: 120, valueFormatter: formatDate }, // есть 
+    { field: 'start_date', headerName: 'начало оказания услуг', width: 150, valueFormatter: formatDate }, // есть 
     { 
         field: 'manual_end_date', 
-        headerName: 'окончание оказания услуг (руками)', 
+        headerName: 'окончание оказания услуг', 
         width: 200, 
         valueFormatter: formatDate,
-        editable: true,   // пользователь может ввести дату
+        editable: true,   //  ввести дату
     },
-    { field: 'end_date', headerName: 'дата окончания договора', width: 150, valueFormatter: formatDate },
-    { field: 'plan_2026', headerName: 'План 2026 год', width: 140 , valueFormatter:formatNumber },
-    { field: 'obligations_2026', headerName: 'Обязательства - Принято обязательств по расходам 2026', width: 280, valueFormatter:formatNumber},
-    { field: 'invoices', headerName: 'Выставлено счетов', width: 160 },
-    { field: 'paid_total', headerName: 'Оплачено всего, в т.ч.', width: 200 },
-    { field: 'balance_remain', headerName: 'Остаток для исполнения', width: 180 },
-    { field: 'approvals_2026', headerName: 'Согласование служебок 2026 год', width: 250 },
-    { field: 'plan_2027', headerName: 'План 2027', width: 140 , valueFormatter:formatNumber },
-    { field: 'obligations_2027', headerName: 'Обязательства - Принято обязательств по расходам 2027', width: 280 , valueFormatter:formatNumber },
-    { field: 'approvals_2027', headerName: 'Согласование служебок 2027 год', width: 250 }
+    { field: 'end_date', headerName: 'дата окончания договора', width: 150, valueFormatter: formatDate }, // есть 
+    { field: 'plan_2026', headerName: 'План 2026 год', width: 140 , valueFormatter:formatNumber }, // есть 
+    { field: 'obligations_2026', headerName: 'Обязательства - Принято обязательств по расходам 2026', width: 280, valueFormatter:formatNumber}, // Сумма тек. года
+    { field: 'invoices', headerName: 'Выставлено счетов', width: 160 }, // нет 
+    { field: 'paid_total', headerName: 'Оплачено всего, в т.ч.', width: 200 }, // Исполнено в тек. году
+    { field: 'balance_remain', headerName: 'Остаток для исполнения', width: 180 }, // нет (Обязательства - Принято обязательств по расходам 2026 - Оплачено всего, в т.ч.)
+    { field: 'approvals_2026', headerName: 'Согласование служебок 2026 год', width: 250 }, // нет (надо откуда-то брать )
+    { field: 'plan_2027', headerName: 'План 2027', width: 140 , valueFormatter:formatNumber }, // есть 
+    { field: 'obligations_2027', headerName: 'Обязательства - Принято обязательств по расходам 2027', width: 280 , valueFormatter:formatNumber }, // нет  
+    { field: 'approvals_2027', headerName: 'Согласование служебок 2027 год', width: 250 } // нет надо откуда-то брать)
 ];
 
   const defaultColDef = {
@@ -107,6 +109,9 @@ function ReportPage() {
     <div style={{ height: '80vh', width: '100%' }}>
       <div style={{ marginBottom: 10 }}>
         <button onClick={exportToExcel} style={{ padding: '8px 16px' }}>📎 Экспорт в Excel</button>
+        <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>
+          Перейти к ПФХД
+        </button>
       </div>
       <div className="ag-theme-alpine" style={{ height: 'calc(100% - 50px)', width: '100%' }}>
         <AgGridReact
