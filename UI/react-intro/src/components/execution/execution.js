@@ -36,49 +36,15 @@ function Execution() {
   const navigate = useNavigate();
 
   const [columnDefs] = useState([
-    { 
-      headerName: 'КФСР', 
-      field: 'kfsr', 
-      width: 120,
-      pinned: 'left',
-      checkboxSelection: true,
-      headerCheckboxSelection: true,
-      editable: true,
-      resizable: true 
-    },
-    { 
-      headerName: 'КЦСР', 
-      field: 'kcsr', 
-      width: 150,
-      pinned: 'left',
-      editable: true,
-      resizable: true 
-    },
-    { 
-      headerName: 'КВР', 
-      field: 'kvr', 
-      width: 100,
-      editable: true,
-      resizable: true 
-    },
-    { 
-      headerName: 'КОСГУ', 
-      field: 'kosgu', 
-      width: 100,
-      editable: true,
-      resizable: true 
-    },
-    { 
-      headerName: 'КВФО', 
-      field: 'kvfo', 
-      width: 100,
-      editable: true,
-      resizable: true 
-    },
+    { headerName: 'КФСР', field: 'kfsr', width: 120, pinned: 'left', editable: true, resizable: true },
+    { headerName: 'КЦСР', field: 'kcsr', width: 150, pinned: 'left', editable: true, resizable: true },
+    { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
+    { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true },
+    { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true },
     { 
       headerName: 'Выплаты - План с изменениями 2026', 
       field: 'payment_plan_2026', 
-      width: 250,
+      width: 320,
       editable: true,
       valueFormatter: formatNumber,
       valueSetter: (params) => {
@@ -91,7 +57,7 @@ function Execution() {
     { 
       headerName: 'Выплаты - План с изменениями 2027', 
       field: 'payment_plan_2027', 
-      width: 250,
+      width: 320,
       editable: true,
       valueFormatter: formatNumber,
       valueSetter: (params) => {
@@ -104,7 +70,7 @@ function Execution() {
     { 
       headerName: 'Выплаты - План с изменениями 2028', 
       field: 'payment_plan_2028', 
-      width: 250,
+      width: 320,
       editable: true,
       valueFormatter: formatNumber,
       valueSetter: (params) => {
@@ -150,49 +116,34 @@ function Execution() {
     fetchData();
   }, [fetchData]);
 
-  // Импорт из Excel
   const handleImport = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-  
-    
     if (!file.name.match(/\.(xlt)$/i)) {
       alert('Пожалуйста, выберите файл Excel (.xlt)');
       return;
     }
-  
     setLoading(true);
-  
     try {
       const results = await ExcelService.importFromExcel(file, api);
-      
-      // Обновляем данные в таблице
       await fetchData();
-  
-      // Показываем результат
       let message = `Импорт завершен!\n`;
       message += `Добавлено: ${results.added}\n`;
       message += `Обновлено: ${results.updated}\n`;
-      if (results.errors.length > 0) {
-        message += `Ошибок: ${results.errors.length}`;
-      }
+      if (results.errors.length > 0) message += `Ошибок: ${results.errors.length}`;
       alert(message);
-  
     } catch (error) {
       console.error('Ошибка импорта:', error);
       alert(`Ошибка при импорте: ${error.message}`);
     } finally {
       setLoading(false);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [fetchData]);
 
   const saveToDatabase = useCallback(async (row) => {
     if (savingRows.has(row.id)) return false;
     setSavingRows(prev => new Set(prev).add(row.id));
-    
     try {
       const dataToSend = {
         kfsr: row.kfsr || '',
@@ -204,7 +155,6 @@ function Execution() {
         payment_plan_2027: parseNumber(row.payment_plan_2027),
         payment_plan_2028: parseNumber(row.payment_plan_2028)
       };
-      
       await api.post(`execution/edit/${row.id}`, dataToSend);
       return true;
     } catch (err) {
@@ -218,7 +168,6 @@ function Execution() {
 
   const saveNewRowToDB = useCallback(async (row) => {
     if (!row.is_new) return true;
-    
     try {
       const dataToSend = {
         kfsr: row.kfsr || '',
@@ -230,14 +179,10 @@ function Execution() {
         payment_plan_2027: parseNumber(row.payment_plan_2027),
         payment_plan_2028: parseNumber(row.payment_plan_2028)
       };
-          
       const response = await api.post('execution/create', dataToSend);
-      
       if (response.data && response.data.id) {
         setRowData(prevData => prevData.map(item => {
-          if (item.id === row.id) {
-            return { ...row, id: response.data.id, is_new: false };
-          }
+          if (item.id === row.id) return { ...row, id: response.data.id, is_new: false };
           return item;
         }));
         return true;
@@ -254,15 +199,12 @@ function Execution() {
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;
     if (newValue === oldValue) return;
-    
     const updatedRow = { ...data, [colDef.field]: newValue };
     setRowData(prevData => prevData.map(item => item.id === data.id ? updatedRow : item));
-    
     if (data.is_new) {
       await saveNewRowToDB(updatedRow);
       return;
     }
-    
     const success = await saveToDatabase(updatedRow);
     if (!success) {
       setRowData(prevData => prevData.map(item => item.id === data.id ? data : item));
@@ -271,7 +213,6 @@ function Execution() {
 
   const handleAddRow = useCallback(() => {
     const tempId = -Date.now();
-    
     const newRow = { 
       id: tempId,
       is_new: true,
@@ -284,9 +225,7 @@ function Execution() {
       payment_plan_2027: 0,
       payment_plan_2028: 0
     };
-    
     setRowData(prevData => [...prevData, newRow]);
-    
     setTimeout(() => {
       if (gridRef.current) {
         const newRowIndex = rowData.length;
@@ -304,19 +243,15 @@ function Execution() {
       alert('Сначала отметьте галочкой строки для удаления');
       return;
     }
-    
     if (!window.confirm(`Вы уверены, что хотите удалить ${selectedNodes.length} запись(ей)?`)) {
       return;
     }
-    
     const selectedRows = selectedNodes.map(node => node.data);
     const existingRows = selectedRows.filter(row => !row.is_new);
     const newRows = selectedRows.filter(row => row.is_new);
-    
     if (newRows.length > 0) {
       setRowData(prevData => prevData.filter(row => !newRows.some(r => r.id === row.id)));
     }
-    
     if (existingRows.length > 0) {
       try {
         const deletePromises = existingRows.map(row => api.delete(`execution/delete/${row.id}`));
@@ -335,58 +270,47 @@ function Execution() {
     filter: true,
     resizable: true,
     editable: true,
+    wrapText: true,      // перенос текста
+    autoHeight: true,    // автовысота строки
+    minWidth: 100,
   };
 
-  if (loading) {
-    return <div className="execution-loading"><div>Загрузка данных...</div></div>;
-  }
-
-  if (error) {
-    return (
-      <div className="execution-error">
-        <div className="execution-error-message">Ошибка: {error}</div>
-        <button onClick={fetchData} className="execution-error-btn">Повторить попытку</button>
-      </div>
-    );
-  }
+  if (loading) return <div className="execution-loading"><div>Загрузка данных...</div></div>;
+  if (error) return (
+    <div className="execution-error">
+      <div className="execution-error-message">Ошибка: {error}</div>
+      <button onClick={fetchData} className="execution-error-btn">Повторить попытку</button>
+    </div>
+  );
 
   return (
     <div className="execution-container">
       <div className="execution-toolbar">
-        <button onClick={handleAddRow} className="execution-btn execution-btn-add">+ Добавить строку</button>
-        <button onClick={handleDeleteRow} className="execution-btn execution-btn-delete">- Удалить выбранные</button>
+        <button onClick={handleAddRow} className="execution-btn execution-btn-add">Добавить строку</button>
+        <button onClick={handleDeleteRow} className="execution-btn execution-btn-delete">Удалить выбранные</button>
         <button onClick={fetchData} className="execution-btn execution-btn-refresh">Обновить</button>
-        <button onClick={() => fileInputRef.current.click()} className="execution-btn execution-btn-import">
-          Загрузить из Excel
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept=".xlsx,.xls,.xlt,.xltx"
-          style={{ display: 'none' }}
-          onChange={handleImport}
-        />
+        <button onClick={() => fileInputRef.current.click()} className="execution-btn execution-btn-import">Загрузить из Excel</button>
+        <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.xlt,.xltx" style={{ display: 'none' }} onChange={handleImport} />
         {savingRows.size > 0 && <span className="execution-saving-indicator">Сохранение...</span>}
-        <button className="execution-btn execution-btn-nav" onClick={() => navigate("/summary")}>
-          Перейти к договорам 
-        </button>
-        <button className="execution-btn execution-btn-nav" onClick={() => navigate("/BudgetPlan")}>
-          Перейти к отчетам
-        </button>
+        <button className="execution-btn execution-btn-nav" onClick={() => navigate("/summary")}>Перейти к договорам</button>
+        <button className="execution-btn execution-btn-nav" onClick={() => navigate("/BudgetPlan")}>Перейти к отчетам</button>
       </div>
-
       <div className="execution-grid-container ag-theme-alpine">
         <AgGridReact
           ref={gridRef}
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          rowSelection="multiple"
-          suppressRowClickSelection={true}
+          rowSelection={{
+            mode: 'multiRow',
+            headerCheckbox: true,
+            enableClickSelection: true,
+          }}
           animateRows={true}
           onCellValueChanged={onCellValueChanged}
           stopEditingWhenCellsLoseFocus={true}
           singleClickEdit={false}
+          suppressHorizontalScroll={false}
         />
       </div>
     </div>

@@ -6,8 +6,11 @@ import 'ag-grid-community/styles/ag-grid.css';
 import 'ag-grid-community/styles/ag-theme-alpine.css';
 
 const formatNumber = (params) => {
-  if (params.value === undefined || params.value === null || params.value === 0) return '';
-  return Number(params.value).toLocaleString('ru-RU');
+  const value = params.value;
+  if (value === undefined || value === null || value === '') return '';
+  const num = Number(value);
+  if (isNaN(num)) return '';
+  return num.toLocaleString('ru-RU');
 };
 
 const formatDate = (params) => {
@@ -27,7 +30,7 @@ function ReportPage() {
   const [rowData, setRowData] = useState([]);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
+  const baseURL = process.env.REACT_APP_API_URL || 'http://192.168.19.101:3001/';
   const api = axios.create({ baseURL, headers: { 'Content-Type': 'application/json' } });
 
   const fetchReport = useCallback(async () => {
@@ -80,12 +83,12 @@ function ReportPage() {
         editable: true,   //  ввести дату
     },
     { field: 'end_date', headerName: 'дата окончания договора', width: 150, valueFormatter: formatDate }, // есть 
-    { field: 'plan_2026', headerName: 'План 2026 год', width: 140 , valueFormatter:formatNumber }, // есть 
+    { field: 'plan_2026', headerName: 'План 2026 год', width: 140, valueFormatter:formatNumber }, // есть 
     { field: 'obligations_2026', headerName: 'Обязательства - Принято обязательств по расходам 2026', width: 280, valueFormatter:formatNumber}, // Сумма тек. года
     { field: 'invoices', headerName: 'Выставлено счетов', width: 160 }, // нет 
-    { field: 'paid_total', headerName: 'Оплачено всего, в т.ч.', width: 200 }, // Исполнено в тек. году
+    { field: 'paid_total', headerName: 'Оплачено всего, в т.ч.', width: 200 ,  valueFormatter:formatNumber }, // Исполнено в тек. году
     { field: 'balance_remain', headerName: 'Остаток для исполнения', width: 180 }, // нет (Обязательства - Принято обязательств по расходам 2026 - Оплачено всего, в т.ч.)
-    { field: 'approvals_2026', headerName: 'Согласование служебок 2026 год', width: 250 }, // нет (надо откуда-то брать )
+    { field: 'approvals_2026', headerName: 'Согласование служебок 2026 год', width: 250 }, // нет надо откуда-то брать)
     { field: 'plan_2027', headerName: 'План 2027', width: 140 , valueFormatter:formatNumber }, // есть 
     { field: 'obligations_2027', headerName: 'Обязательства - Принято обязательств по расходам 2027', width: 280 , valueFormatter:formatNumber }, // нет  
     { field: 'approvals_2027', headerName: 'Согласование служебок 2027 год', width: 250 } // нет надо откуда-то брать)
@@ -106,7 +109,7 @@ function ReportPage() {
   if (loading) return <div>Загрузка отчёта...</div>;
 
   return (
-    <div style={{ height: '80vh', width: '100%' }}>
+    <div style={{ height: '100vh', width: '100%' }}>
       <div style={{ marginBottom: 10 }}>
         <button onClick={exportToExcel} style={{ padding: '8px 16px' }}>📎 Экспорт в Excel</button>
         <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>

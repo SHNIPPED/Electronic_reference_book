@@ -21,11 +21,16 @@ class BudgetReportController {
                 const children = contractsByKey.get(childKey) || [];
     
                 let totalExecCurrYear = 0;
+                let totalCurrYearSum = 0;
+                let totalAdvanceSum = 0;
                 let kcsrName = '';
+    
                 if (children.length > 0) {
                     kcsrName = children[0].osnovanie || '';
                     children.forEach(child => {
                         totalExecCurrYear += Number(child.exec_curr_year) || 0;
+                        totalCurrYearSum += Number(child.curr_year_sum) || 0;
+                        totalAdvanceSum += Number(child.advance_sum) || 0;
                     });
                 }
     
@@ -44,25 +49,31 @@ class BudgetReportController {
                     start_date: null,
                     manual_end_date: null,
                     end_date: null,
-                    plan_2026: exec.payment_plan_2026 || 0,
-                    plan_2027: exec.payment_plan_2027 || 0,
-                    obligations_2026: totalExecCurrYear,
+                    plan_2026: Number(exec.payment_plan_2026) || 0,
+                    plan_2027: Number(exec.payment_plan_2027) || 0,
+                    obligations_2026: totalCurrYearSum,          // Сумма curr_year_sum детей
                     invoices: '',
-                    paid_total: '',
-                    balance_remain: '',
+                    paid_total: totalExecCurrYear,              // Сумма exec_curr_year детей
+                    balance_remain: totalCurrYearSum - totalExecCurrYear, // Остаток по обязательствам
                     approvals_2026: '',
                     obligations_2027: '',
                     approvals_2027: '',
+                    advance_sum: totalAdvanceSum,               // Сумма авансов детей
                 });
     
                 // Дочерние строки
                 children.forEach(child => {
+                    const childCurrYearSum = Number(child.curr_year_sum) || 0;
+                    const childExecCurrYear = Number(child.exec_curr_year) || 0;
+                    const childAdvance = Number(child.advance_sum) || 0;
+                    const childBalanceRemain = childCurrYearSum - childExecCurrYear; // Остаток по контракту
+    
                     flatRows.push({
                         id: `child_${child.id}_${exec.id}`,
                         type: 'child',
                         parentId: parentId,
                         kfsr: child.kfsr,
-                        kcsr: child.kcsr,
+                        kcsr: child.doc_num,                      // номер документа в поле КЦСР
                         kcsr_name: child.osnovanie || '',
                         kvr: child.kvr,
                         kosgu: child.kosgu,
@@ -74,13 +85,14 @@ class BudgetReportController {
                         manual_end_date: null,
                         plan_2026: '',
                         plan_2027: '',
-                        obligations_2026: child.exec_curr_year || '',
+                        obligations_2026: childCurrYearSum,        // curr_year_sum контракта
                         invoices: '',
-                        paid_total: '',
-                        balance_remain: '',
+                        paid_total: childExecCurrYear,             // exec_curr_year контракта
+                        balance_remain: childBalanceRemain,        // индивидуальный остаток
                         approvals_2026: '',
                         obligations_2027: '',
                         approvals_2027: '',
+                        advance_sum: childAdvance,                 // аванс по контракту
                     });
                 });
             }
@@ -117,7 +129,7 @@ class BudgetReportController {
                 flatRows.push({
                     "КФСР": exec.kfsr || '',
                     "КЦСР": exec.kcsr || '',
-                    "Наименование КЦСР": kcsrName,   // ← заполнено
+                    "Наименование КЦСР": kcsrName,  
                     "КВР": exec.kvr || '',
                     "КОСГУ": exec.kosgu || '',
                     "КВФО": exec.kvfo || '',
