@@ -1,0 +1,80 @@
+.report-container {
+    padding: 20px;
+    background-color: #f4f7fb;
+    height: 96vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  
+  .report-toolbar {
+    background: white;
+    border-radius: 12px;
+    padding: 12px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  
+  .report-btn {
+    border: none;
+    padding: 8px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    background-color: #eef2ff;
+    color: #1e40af;
+  }
+  .report-btn-primary { background-color: #2563eb; color: white; }
+  .report-btn-primary:hover { background-color: #1d4ed8; }
+  .report-btn-nav { background-color: #3b82f6; color: white; margin-left: auto; }
+  .report-btn-nav:hover { background-color: #2563eb; }
+  
+  .report-grid-container {
+    flex: 1;
+    min-height: 0;
+    overflow-x: auto;
+    border: 1px solid #0077cc;
+    border-radius: 12px;
+    background: white;
+  }
+  
+  .ag-theme-alpine {
+    --ag-header-background-color: #f0f7ff;
+    --ag-header-foreground-color: #02319b;
+    --ag-border-color: #0077cc;
+    --ag-row-height: auto;
+    --ag-cell-horizontal-padding: 12px;
+    height: 100%;
+    width: 100%;
+    min-width: 1600px;
+  }
+  .ag-theme-alpine .ag-cell {
+    border-right: 1px solid #0077cc;
+    border-bottom: 1px solid #0077cc;
+    padding: 10px 12px;
+    white-space: normal !important;
+    word-break: break-word;
+  }
+  .ag-theme-alpine .ag-header-cell {
+    border-right: 1px solid #0077cc;
+    border-bottom: 1px solid #0077cc;
+    background-color: #f0f7ff;
+    color: #02319b;
+    font-weight: 600;
+  }
+  .ag-theme-alpine .ag-row-odd { background-color: #ffffff; }
+  .ag-theme-alpine .ag-row-even { background-color: #fafcff; }
+  
+  .report-loading {
+    text-align: center;
+    padding: 40px;
+    background: white;
+    border-radius: 12px;
+    max-width: 500px;
+    margin: 100px auto;
+  }

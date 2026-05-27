@@ -116,7 +116,7 @@ function Summary() {
   const navigate = useNavigate();
 
   const [columnDefs] = useState([
-    { headerName: 'Номер документа', field: 'doc_num', width: 180, pinned: 'left', checkboxSelection: true, headerCheckboxSelection: true, editable: true, resizable: true },
+    { headerName: 'Номер документа', field: 'doc_num', width: 180, pinned: 'left', editable: true, resizable: true },
     { headerName: 'Статус документа', field: 'doc_status', width: 150, editable: true, resizable: true },
     { headerName: 'Дата документа', field: 'doc_date', width: 140, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
     { headerName: 'Дата регистрации', field: 'reg_date', width: 150, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
@@ -140,7 +140,7 @@ function Summary() {
     { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
     { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true }, 
     { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true }
-]);
+  ]);
 
   const [rowData, setRowData] = useState([]);
 
@@ -185,7 +185,6 @@ function Summary() {
 
     try {
       const results = await SummaryExcelService.importFromExcel(file, api);
-      
       await fetchData();
 
       let message = `Импорт завершен!\n`;
@@ -212,115 +211,115 @@ function Summary() {
     setSavingRows(prev => new Set(prev).add(row.id));
     
     try {
-        const formatDateForMySQL = (date) => {
-            if (!date) return null;
-            const d = new Date(date);
-            if (isNaN(d.getTime())) return null;
-            return d.toISOString().split('T')[0];
-        };
-        
-        const dataToSend = {
-            doc_num: row.doc_num,
-            doc_status: row.doc_status,
-            doc_date: formatDateForMySQL(row.doc_date),
-            reg_date: formatDateForMySQL(row.reg_date),
-            exec_date: formatDateForMySQL(row.exec_date),
-            total_sum: Number(row.total_sum) || 0,
-            contract_type: row.contract_type || '',
-            counterparty: row.counterparty || '',
-            contract_sum: Number(row.contract_sum) || 0,
-            curr_year_sum: Number(row.curr_year_sum) || 0,
-            exec_curr_year: Number(row.exec_curr_year) || 0,
-            exec_past_periods: Number(row.exec_past_periods) || 0,
-            in_execution: Number(row.in_execution) || 0,
-            advance_sum: Number(row.advance_sum) || 0,
-            balance: Number(row.balance) || 0,
-            total_balance: Number(row.total_balance) || 0,
-            base_doc_date: formatDateForMySQL(row.base_doc_date),
-            start_date: formatDateForMySQL(row.start_date),
-            end_date: formatDateForMySQL(row.end_date),
-            osnovanie: row.osnovanie || '',
-            kcsr: row.kcsr || '',
-            kvr: row.kvr || '',
-            kosgu: row.kosgu || '',  // Добавлено
-            kvfo: row.kvfo || ''
-        };
-        
-        await api.post(`Summary/edit/${row.id}`, dataToSend);
-        return true;
+      const formatDateForMySQL = (date) => {
+        if (!date) return null;
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().split('T')[0];
+      };
+      
+      const dataToSend = {
+        doc_num: row.doc_num,
+        doc_status: row.doc_status,
+        doc_date: formatDateForMySQL(row.doc_date),
+        reg_date: formatDateForMySQL(row.reg_date),
+        exec_date: formatDateForMySQL(row.exec_date),
+        total_sum: Number(row.total_sum) || 0,
+        contract_type: row.contract_type || '',
+        counterparty: row.counterparty || '',
+        contract_sum: Number(row.contract_sum) || 0,
+        curr_year_sum: Number(row.curr_year_sum) || 0,
+        exec_curr_year: Number(row.exec_curr_year) || 0,
+        exec_past_periods: Number(row.exec_past_periods) || 0,
+        in_execution: Number(row.in_execution) || 0,
+        advance_sum: Number(row.advance_sum) || 0,
+        balance: Number(row.balance) || 0,
+        total_balance: Number(row.total_balance) || 0,
+        base_doc_date: formatDateForMySQL(row.base_doc_date),
+        start_date: formatDateForMySQL(row.start_date),
+        end_date: formatDateForMySQL(row.end_date),
+        osnovanie: row.osnovanie || '',
+        kcsr: row.kcsr || '',
+        kvr: row.kvr || '',
+        kosgu: row.kosgu || '',
+        kvfo: row.kvfo || ''
+      };
+      
+      await api.post(`Summary/edit/${row.id}`, dataToSend);
+      return true;
     } catch (err) {
-        console.error('Ошибка сохранения:', err);
-        alert(`Ошибка: ${err.response?.data?.message || err.message}`);
-        return false;
+      console.error('Ошибка сохранения:', err);
+      alert(`Ошибка: ${err.response?.data?.message || err.message}`);
+      return false;
     } finally {
-        setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
+      setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
     }
-}, []);
+  }, []);
 
-const saveNewRowToDB = useCallback(async (row) => {
-  if (!row.is_new) return true;
-  
-  if (!row.doc_num || !row.doc_num.trim()) {
+  const saveNewRowToDB = useCallback(async (row) => {
+    if (!row.is_new) return true;
+    
+    if (!row.doc_num || !row.doc_num.trim()) {
       alert('Заполните номер документа');
       return false;
-  }
-  
-  try {
+    }
+    
+    try {
       const formatDateForMySQL = (date) => {
-          if (!date) return null;
-          const d = new Date(date);
-          if (isNaN(d.getTime())) return null;
-          return d.toISOString().split('T')[0];
+        if (!date) return null;
+        const d = new Date(date);
+        if (isNaN(d.getTime())) return null;
+        return d.toISOString().split('T')[0];
       };
       
       const currentDate = formatDateForMySQL(new Date());
       
       const dataToSend = {
-          doc_num: row.doc_num?.trim(),
-          doc_status: row.doc_status || 'Черновик',
-          doc_date: formatDateForMySQL(row.doc_date) || currentDate,
-          reg_date: formatDateForMySQL(row.reg_date),
-          exec_date: formatDateForMySQL(row.exec_date),
-          total_sum: Number(row.total_sum) || 0,
-          contract_type: row.contract_type || '',
-          counterparty: row.counterparty || '',
-          contract_sum: Number(row.contract_sum) || 0,
-          curr_year_sum: Number(row.curr_year_sum) || 0,
-          exec_curr_year: Number(row.exec_curr_year) || 0,
-          exec_past_periods: Number(row.exec_past_periods) || 0,
-          in_execution: Number(row.in_execution) || 0,
-          advance_sum: Number(row.advance_sum) || 0,
-          balance: Number(row.balance) || 0,
-          total_balance: Number(row.total_balance) || 0,
-          base_doc_date: formatDateForMySQL(row.base_doc_date),
-          start_date: formatDateForMySQL(row.start_date) || currentDate,
-          end_date: formatDateForMySQL(row.end_date),
-          osnovanie: row.osnovanie || '',
-          kcsr: row.kcsr || '',
-          kvr: row.kvr || '',
-          kosgu: row.kosgu || '',  // Добавлено
-          kvfo: row.kvfo || ''
+        doc_num: row.doc_num?.trim(),
+        doc_status: row.doc_status || 'Черновик',
+        doc_date: formatDateForMySQL(row.doc_date) || currentDate,
+        reg_date: formatDateForMySQL(row.reg_date),
+        exec_date: formatDateForMySQL(row.exec_date),
+        total_sum: Number(row.total_sum) || 0,
+        contract_type: row.contract_type || '',
+        counterparty: row.counterparty || '',
+        contract_sum: Number(row.contract_sum) || 0,
+        curr_year_sum: Number(row.curr_year_sum) || 0,
+        exec_curr_year: Number(row.exec_curr_year) || 0,
+        exec_past_periods: Number(row.exec_past_periods) || 0,
+        in_execution: Number(row.in_execution) || 0,
+        advance_sum: Number(row.advance_sum) || 0,
+        balance: Number(row.balance) || 0,
+        total_balance: Number(row.total_balance) || 0,
+        base_doc_date: formatDateForMySQL(row.base_doc_date),
+        start_date: formatDateForMySQL(row.start_date) || currentDate,
+        end_date: formatDateForMySQL(row.end_date),
+        osnovanie: row.osnovanie || '',
+        kcsr: row.kcsr || '',
+        kvr: row.kvr || '',
+        kosgu: row.kosgu || '',
+        kvfo: row.kvfo || ''
       };
           
       const response = await api.post('Summary/create', dataToSend);
       
       if (response.data && response.data.id) {
-          setRowData(prevData => prevData.map(item => {
-              if (item.id === row.id) {
-                  return { ...row, id: response.data.id, is_new: false };
-              }
-              return item;
-          }));
-          return true;
+        setRowData(prevData => prevData.map(item => {
+          if (item.id === row.id) {
+            return { ...row, id: response.data.id, is_new: false };
+          }
+          return item;
+        }));
+        return true;
       }
       return false;
-  } catch (err) {
+    } catch (err) {
       console.error('Ошибка:', err);
       alert(`Ошибка сервера: ${err.response?.data?.message || err.message}`);
       setRowData(prevData => prevData.filter(item => item.id !== row.id));
       return false;
-  }
-}, []);
+    }
+  }, []);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;
@@ -348,46 +347,46 @@ const saveNewRowToDB = useCallback(async (row) => {
     const currentDate = new Date().toISOString();
     
     const newRow = { 
-        id: tempId,
-        is_new: true,
-        doc_num: '',
-        doc_status: 'Черновик',
-        doc_date: currentDate,
-        reg_date: null,
-        exec_date: null,
-        total_sum: 0,
-        contract_type: '',
-        counterparty: '',
-        contract_sum: 0,
-        curr_year_sum: 0,
-        exec_curr_year: 0,
-        exec_past_periods: 0,
-        in_execution: 0,
-        advance_sum: 0,
-        balance: 0,
-        total_balance: 0,
-        base_doc_date: null,
-        start_date: currentDate,
-        end_date: null,
-        osnovanie: '',
-        kcsr: '',
-        kvr: '',
-        kosgu: '', 
-        kvfo: ''
+      id: tempId,
+      is_new: true,
+      doc_num: '',
+      doc_status: 'Черновик',
+      doc_date: currentDate,
+      reg_date: null,
+      exec_date: null,
+      total_sum: 0,
+      contract_type: '',
+      counterparty: '',
+      contract_sum: 0,
+      curr_year_sum: 0,
+      exec_curr_year: 0,
+      exec_past_periods: 0,
+      in_execution: 0,
+      advance_sum: 0,
+      balance: 0,
+      total_balance: 0,
+      base_doc_date: null,
+      start_date: currentDate,
+      end_date: null,
+      osnovanie: '',
+      kcsr: '',
+      kvr: '',
+      kosgu: '', 
+      kvfo: ''
     };
     
     setRowData(prevData => [...prevData, newRow]);
     
     setTimeout(() => {
-        if (gridRef.current) {
-            const newRowIndex = rowData.length;
-            gridRef.current.api.ensureIndexVisible(newRowIndex, 'bottom');
-            setTimeout(() => {
-                gridRef.current.api.startEditingCell({ rowIndex: newRowIndex, colKey: 'doc_num' });
-            }, 100);
-        }
+      if (gridRef.current) {
+        const newRowIndex = rowData.length;
+        gridRef.current.api.ensureIndexVisible(newRowIndex, 'bottom');
+        setTimeout(() => {
+          gridRef.current.api.startEditingCell({ rowIndex: newRowIndex, colKey: 'doc_num' });
+        }, 100);
+      }
     }, 100);
-}, [rowData.length]);
+  }, [rowData.length]);
 
   const handleDeleteRow = useCallback(async () => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
@@ -426,6 +425,9 @@ const saveNewRowToDB = useCallback(async (row) => {
     filter: true,
     resizable: true,
     editable: true,
+    wrapText: true,    
+    autoHeight: true,    
+    minWidth: 100,
   };
 
   if (loading) {
@@ -461,7 +463,7 @@ const saveNewRowToDB = useCallback(async (row) => {
         <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>
           Перейти к ПФХД
         </button>
-        <button className="execution-btn summary-btn-nav" onClick={() => navigate("/BudgetPlan")}>
+        <button className="summary-btn summary-btn-nav" onClick={() => navigate("/BudgetPlan")}>
           Перейти к отчетам
         </button>
       </div>
@@ -472,12 +474,16 @@ const saveNewRowToDB = useCallback(async (row) => {
           rowData={rowData}
           columnDefs={columnDefs}
           defaultColDef={defaultColDef}
-          rowSelection="multiple"
-          suppressRowClickSelection={true}
+          rowSelection={{
+            mode: 'multiRow',
+            headerCheckbox: true,
+            enableClickSelection: true,
+          }}
           animateRows={true}
           onCellValueChanged={onCellValueChanged}
           stopEditingWhenCellsLoseFocus={true}
           singleClickEdit={false}
+          suppressHorizontalScroll={false}
         />
       </div>
     </div>

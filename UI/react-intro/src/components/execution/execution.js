@@ -270,8 +270,8 @@ function Execution() {
     filter: true,
     resizable: true,
     editable: true,
-    wrapText: true,      // перенос текста
-    autoHeight: true,    // автовысота строки
+    wrapText: true,      
+    autoHeight: true,   
     minWidth: 100,
   };
 

@@ -11,12 +11,10 @@ class ExcelService {
         try {
           const data = new Uint8Array(e.target.result);
           
-          // Пробуем прочитать как обычный Excel файл
           let workbook;
           try {
             workbook = XLSX.read(data, { type: 'array' });
           } catch (err) {
-            // Если не читается, пробуем другие настройки
             workbook = XLSX.read(data, { 
               type: 'array',
               cellFormula: true,
@@ -27,7 +25,6 @@ class ExcelService {
           
           const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
           
-          // Получаем все данные как массив массивов
           const rows = XLSX.utils.sheet_to_json(firstSheet, { 
             header: 1, 
             defval: '',
@@ -37,13 +34,11 @@ class ExcelService {
           console.log('Всего строк в файле:', rows.length);
           console.log('Первые 5 строк:', rows.slice(0, 5));
           
-          // Ищем строку с заголовками (КФСР)
           let startRow = -1;
           for (let i = 0; i < rows.length; i++) {
             const row = rows[i];
             if (!row) continue;
             
-            // Проверяем наличие заголовков
             for (let j = 0; j < row.length; j++) {
               const cell = row[j];
               if (cell && String(cell).trim() === 'КФСР') {
@@ -69,17 +64,14 @@ class ExcelService {
             const kfsr = row[0] ? String(row[0]).trim() : '';
             const kcsr = row[1] ? String(row[1]).trim() : '';
             
-            // Пропускаем пустые строки и итоги
             if (!kfsr || !kcsr || kfsr === 'Итого' || kcsr === 'Итого') {
               continue;
             }
             
-            // Получаем значения выплат
             let payment2026 = row[5] ? this.parseNumber(row[5]) : 0;
             let payment2027 = row[6] ? this.parseNumber(row[6]) : 0;
             let payment2028 = row[7] ? this.parseNumber(row[7]) : 0;
             
-            // Если данные не найдены в колонках 5-7, ищем дальше
             if (payment2026 === 0 && payment2027 === 0 && payment2028 === 0) {
               for (let j = 0; j < row.length; j++) {
                 const cell = row[j];
@@ -112,7 +104,6 @@ class ExcelService {
             return;
           }
           
-          // Синхронизация с БД
           const response = await api.get('execution/');
           const existingData = response.data.executions || [];
           const existingMap = new Map();
@@ -162,7 +153,6 @@ class ExcelService {
     if (!value) return 0;
     if (typeof value === 'number') return value;
     if (typeof value === 'string') {
-      // Убираем пробелы и заменяем запятую на точку
       const cleaned = value.replace(/\s/g, '').replace(',', '.');
       const num = parseFloat(cleaned);
       return isNaN(num) ? 0 : num;
