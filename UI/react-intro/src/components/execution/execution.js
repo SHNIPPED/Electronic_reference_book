@@ -30,9 +30,16 @@ const parseNumber = (value) => {
 function Execution() {
   const gridRef = useRef();
   const fileInputRef = useRef();
+  const saveTimeoutRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savingRows, setSavingRows] = useState(new Set());
+  const [selectedRowsCount, setSelectedRowsCount] = useState(0);
+  const [selectedSummary, setSelectedSummary] = useState({
+    payment_plan_2026: 0,
+    payment_plan_2027: 0,
+    payment_plan_2028: 0
+  });
   const navigate = useNavigate();
 
   const [columnDefs] = useState([
@@ -116,6 +123,42 @@ function Execution() {
     fetchData();
   }, [fetchData]);
 
+  const updateSingleRow = useCallback((updatedRow) => {
+    if (!gridRef.current) return;
+    gridRef.current.api.applyTransaction({ update: [updatedRow] });
+  }, []);
+
+  const updateSelectedSummary = useCallback(() => {
+    const selectedNodes = gridRef.current?.api.getSelectedNodes();
+    if (!selectedNodes || selectedNodes.length === 0) {
+      setSelectedRowsCount(0);
+      setSelectedSummary({ payment_plan_2026: 0, payment_plan_2027: 0, payment_plan_2028: 0 });
+      return;
+    }
+
+    let sum2026 = 0;
+    let sum2027 = 0;
+    let sum2028 = 0;
+
+    selectedNodes.forEach(node => {
+      const data = node.data;
+      sum2026 += parseNumber(data.payment_plan_2026);
+      sum2027 += parseNumber(data.payment_plan_2027);
+      sum2028 += parseNumber(data.payment_plan_2028);
+    });
+
+    setSelectedRowsCount(selectedNodes.length);
+    setSelectedSummary({
+      payment_plan_2026: sum2026,
+      payment_plan_2027: sum2027,
+      payment_plan_2028: sum2028
+    });
+  }, []);
+
+  const onSelectionChanged = useCallback(() => {
+    updateSelectedSummary();
+  }, [updateSelectedSummary]);
+
   const handleImport = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -181,10 +224,8 @@ function Execution() {
       };
       const response = await api.post('execution/create', dataToSend);
       if (response.data && response.data.id) {
-        setRowData(prevData => prevData.map(item => {
-          if (item.id === row.id) return { ...row, id: response.data.id, is_new: false };
-          return item;
-        }));
+        const savedRow = { ...row, id: response.data.id, is_new: false };
+        updateSingleRow(savedRow);
         return true;
       }
       return false;
@@ -194,22 +235,42 @@ function Execution() {
       setRowData(prevData => prevData.filter(item => item.id !== row.id));
       return false;
     }
-  }, []);
+  }, [updateSingleRow]);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;
     if (newValue === oldValue) return;
+    
     const updatedRow = { ...data, [colDef.field]: newValue };
-    setRowData(prevData => prevData.map(item => item.id === data.id ? updatedRow : item));
+    updateSingleRow(updatedRow);
+    
+    if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
+    
     if (data.is_new) {
-      await saveNewRowToDB(updatedRow);
+      const hasAllRequired = 
+        updatedRow.kfsr && updatedRow.kfsr.trim() !== '' &&
+        updatedRow.kcsr && updatedRow.kcsr.trim() !== '' &&
+        updatedRow.kvr && updatedRow.kvr.trim() !== '' &&
+        updatedRow.kosgu && updatedRow.kosgu.trim() !== '' &&
+        updatedRow.kvfo && updatedRow.kvfo.trim() !== '';
+      
+      if (hasAllRequired) {
+        saveTimeoutRef.current = setTimeout(async () => {
+          await saveNewRowToDB(updatedRow);
+          saveTimeoutRef.current = null;
+        }, 300);
+      }
       return;
     }
-    const success = await saveToDatabase(updatedRow);
-    if (!success) {
-      setRowData(prevData => prevData.map(item => item.id === data.id ? data : item));
-    }
-  }, [saveToDatabase, saveNewRowToDB]);
+    
+    saveTimeoutRef.current = setTimeout(async () => {
+      const success = await saveToDatabase(updatedRow);
+      if (!success) {
+        updateSingleRow(data);
+      }
+      saveTimeoutRef.current = null;
+    }, 300);
+  }, [saveToDatabase, saveNewRowToDB, updateSingleRow]);
 
   const handleAddRow = useCallback(() => {
     const tempId = -Date.now();
@@ -249,6 +310,7 @@ function Execution() {
     const selectedRows = selectedNodes.map(node => node.data);
     const existingRows = selectedRows.filter(row => !row.is_new);
     const newRows = selectedRows.filter(row => row.is_new);
+    
     if (newRows.length > 0) {
       setRowData(prevData => prevData.filter(row => !newRows.some(r => r.id === row.id)));
     }
@@ -263,15 +325,16 @@ function Execution() {
         alert(`Ошибка при удалении: ${err.response?.data?.message || err.message}`);
       }
     }
-  }, [fetchData]);
+    updateSelectedSummary();
+  }, [fetchData, updateSelectedSummary]);
 
   const defaultColDef = {
     sortable: true,
     filter: true,
     resizable: true,
     editable: true,
-    wrapText: true,      
-    autoHeight: true,   
+    wrapText: true,
+    autoHeight: true,
     minWidth: 100,
   };
 
@@ -308,11 +371,36 @@ function Execution() {
           }}
           animateRows={true}
           onCellValueChanged={onCellValueChanged}
+          onSelectionChanged={onSelectionChanged}
           stopEditingWhenCellsLoseFocus={true}
           singleClickEdit={false}
           suppressHorizontalScroll={false}
+          immutableData={true}
+          getRowId={(params) => String(params.data.id)}
         />
       </div>
+      
+      {selectedRowsCount > 0 && (
+        <div className="execution-selection-summary">
+          <div className="execution-selection-summary-title">
+            Выделено строк: <strong>{selectedRowsCount}</strong>
+          </div>
+          <div className="execution-selection-summary-values">
+            <div className="summary-item">
+              <span className="summary-label">Выплаты 2026:</span>
+              <span className="summary-value">{formatNumber({ value: selectedSummary.payment_plan_2026 })}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Выплаты 2027:</span>
+              <span className="summary-value">{formatNumber({ value: selectedSummary.payment_plan_2027 })}</span>
+            </div>
+            <div className="summary-item">
+              <span className="summary-label">Выплаты 2028:</span>
+              <span className="summary-value">{formatNumber({ value: selectedSummary.payment_plan_2028 })}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

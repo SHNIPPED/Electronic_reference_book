@@ -7,6 +7,7 @@
     "ag-grid-react": "^35.2.1",
     "axios": "^1.8.1",
     "cra-template": "1.2.0",
+    "exceljs": "^4.4.0",
     "jsonwebtoken": "^9.0.2",
     "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
@@ -14,7 +15,8 @@
     "react-router-dom": "^7.1.2",
     "react-scripts": "^5.0.1",
     "serve": "^14.2.4",
-    "xlsx": "^0.18.5"
+    "xlsx": "^0.18.5",
+    "xlsx-style": "^0.8.13"
   },
   "scripts": {
     "start": "react-scripts start",

@@ -3,8 +3,14 @@ import db from '../config/database.js';
 class SummaryModule {
 
     static async getAll() {
-        const query = "SELECT * FROM des.contracts ORDER BY id DESC";
-    
+        const query = `SELECT c.*, 
+            ca.approvals_2026, 
+            ca.obligations_2027, 
+            ca.approvals_2027
+            FROM des.contracts c
+            LEFT JOIN des.contract_additional ca ON c.id = ca.contract_id
+            ORDER BY c.id DESC`;
+        
         return new Promise((resolve, reject) => {
             db.query(query, (error, result) => {
                 if (error) reject(error);
@@ -97,6 +103,56 @@ class SummaryModule {
                 else resolve(res);
             });
         });
+    }
+
+    static async updateExecDate(id, exec_date) {
+        const query = 'UPDATE des.contracts SET exec_date = ? WHERE id = ?';
+        const values = [exec_date || null, id];
+    
+        return new Promise((resolve, reject) => {
+            db.query(query, values, (error, res) => {
+                if (error) reject(error);
+                else resolve(res);
+            });
+        });
+    }
+
+    static async updateContractFields(id, updates) {
+        try {
+            const updateData = {};
+            
+            if (updates.approvals_2026 !== undefined) updateData.approvals_2026 = updates.approvals_2026;
+            if (updates.obligations_2027 !== undefined) updateData.obligations_2027 = updates.obligations_2027;
+            if (updates.approvals_2027 !== undefined) updateData.approvals_2027 = updates.approvals_2027;
+            
+            const fields = Object.keys(updateData);
+            if (fields.length === 0) return { affectedRows: 0 };
+            
+            const setClause = fields.map(f => `${f} = VALUES(${f})`).join(', ');
+            const placeholders = fields.map(() => '?').join(', ');
+            
+            const query = `
+                INSERT INTO des.contract_additional (contract_id, ${fields.join(', ')})
+                VALUES (?, ${placeholders})
+                ON DUPLICATE KEY UPDATE ${setClause}
+            `;
+            
+            const values = [id, ...fields.map(f => updateData[f])];
+            
+            return new Promise((resolve, reject) => {
+                db.query(query, values, (error, res) => {
+                    if (error) {
+                        console.error('SQL error in updateContractFields:', error);
+                        reject(error);
+                    } else {
+                        resolve(res);
+                    }
+                });
+            });
+        } catch (error) {
+            console.error('Error in updateContractFields:', error);
+            throw error;
+        }
     }
 }
      

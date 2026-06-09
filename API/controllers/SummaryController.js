@@ -52,7 +52,6 @@ class SummaryController{
                 return res.status(400).json({ message: 'Некорректный ID' });
             }
 
-            // Проверка обязательных полей
             if (!summaryData.doc_num || !summaryData.doc_status || !summaryData.doc_date || 
                 !summaryData.total_sum || !summaryData.counterparty || !summaryData.end_date) {
                 return res.status(400).json({ 

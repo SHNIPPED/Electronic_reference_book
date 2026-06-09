@@ -53,7 +53,7 @@ services:
       DB_PASSWORD: Asdfg123
       DB_NAME: des
     depends_on:
-      mariadb:
+      - mariadb
         
     networks:
       - api_network

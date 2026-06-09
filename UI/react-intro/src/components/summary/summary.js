@@ -11,7 +11,6 @@ import './summary.css';
 
 ModuleRegistry.registerModules([AllCommunityModule]);
 
-// Форматирование чисел
 const formatNumber = (params) => {
   if (params.value == null || params.value === '') return '';
   return new Intl.NumberFormat('ru-RU', {
@@ -20,7 +19,6 @@ const formatNumber = (params) => {
   }).format(params.value);
 };
 
-// Форматирование даты
 const formatDate = (dateString) => {
   if (!dateString) return '';
   const date = new Date(dateString);
@@ -32,7 +30,6 @@ const formatDate = (dateString) => {
   });
 };
 
-// Редактор дат
 class SimpleTextEditor {
   init(params) {
     this.params = params;
@@ -110,6 +107,7 @@ class SimpleTextEditor {
 function Summary() {
   const gridRef = useRef();
   const fileInputRef = useRef();
+  const saveTimeoutRef = useRef(null);               
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [savingRows, setSavingRows] = useState(new Set());
@@ -122,7 +120,6 @@ function Summary() {
     { headerName: 'Дата регистрации', field: 'reg_date', width: 150, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
     { headerName: 'Дата исполнения', field: 'exec_date', width: 150, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
     { headerName: 'Общая сумма', field: 'total_sum', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
-    { headerName: 'Признак договора', field: 'contract_type', width: 160, editable: true, resizable: true },
     { headerName: 'Организация контрагента', field: 'counterparty', width: 350, editable: true, wrapText: true, autoHeight: true, resizable: true },
     { headerName: 'Сумма контракта', field: 'contract_sum', width: 160, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
     { headerName: 'Сумма тек. года', field: 'curr_year_sum', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
@@ -176,7 +173,18 @@ function Summary() {
     fetchData();
   }, [fetchData]);
 
-  // Импорт из Excel
+  const updateSingleRow = useCallback((updatedRow) => {
+    if (!gridRef.current) return;
+    const api = gridRef.current.api;
+    api.applyTransaction({ update: [updatedRow] });
+    const rowNode = api.getRowNode(String(updatedRow.id));
+    if (rowNode) {
+      rowNode.setData(updatedRow);
+    } else {
+      setRowData(prevData => prevData.map(item => item.id === updatedRow.id ? updatedRow : item));
+    }
+  }, []);
+
   const handleImport = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
@@ -186,7 +194,6 @@ function Summary() {
     try {
       const results = await SummaryExcelService.importFromExcel(file, api);
       await fetchData();
-
       let message = `Импорт завершен!\n`;
       message += `Добавлено: ${results.added}\n`;
       message += `Обновлено: ${results.updated}\n`;
@@ -194,7 +201,6 @@ function Summary() {
         message += `Ошибок: ${results.errors.length}`;
       }
       alert(message);
-
     } catch (error) {
       console.error('Ошибка импорта:', error);
       alert(`Ошибка при импорте: ${error.message}`);
@@ -218,10 +224,17 @@ function Summary() {
         return d.toISOString().split('T')[0];
       };
       
+      let endDate = row.end_date;
+      if (!endDate) {
+        const defaultEndDate = new Date();
+        defaultEndDate.setFullYear(defaultEndDate.getFullYear() + 1);
+        endDate = defaultEndDate;
+      }
+      
       const dataToSend = {
-        doc_num: row.doc_num,
-        doc_status: row.doc_status,
-        doc_date: formatDateForMySQL(row.doc_date),
+        doc_num: row.doc_num || '',
+        doc_status: row.doc_status || 'Черновик',
+        doc_date: formatDateForMySQL(row.doc_date) || formatDateForMySQL(new Date()),
         reg_date: formatDateForMySQL(row.reg_date),
         exec_date: formatDateForMySQL(row.exec_date),
         total_sum: Number(row.total_sum) || 0,
@@ -237,7 +250,7 @@ function Summary() {
         total_balance: Number(row.total_balance) || 0,
         base_doc_date: formatDateForMySQL(row.base_doc_date),
         start_date: formatDateForMySQL(row.start_date),
-        end_date: formatDateForMySQL(row.end_date),
+        end_date: formatDateForMySQL(endDate),
         osnovanie: row.osnovanie || '',
         kcsr: row.kcsr || '',
         kvr: row.kvr || '',
@@ -273,6 +286,9 @@ function Summary() {
       };
       
       const currentDate = formatDateForMySQL(new Date());
+      const nextYearDate = new Date();
+      nextYearDate.setFullYear(nextYearDate.getFullYear() + 1);
+      const nextYearStr = formatDateForMySQL(nextYearDate);
       
       const dataToSend = {
         doc_num: row.doc_num?.trim(),
@@ -293,7 +309,7 @@ function Summary() {
         total_balance: Number(row.total_balance) || 0,
         base_doc_date: formatDateForMySQL(row.base_doc_date),
         start_date: formatDateForMySQL(row.start_date) || currentDate,
-        end_date: formatDateForMySQL(row.end_date),
+        end_date: formatDateForMySQL(row.end_date) || nextYearStr,
         osnovanie: row.osnovanie || '',
         kcsr: row.kcsr || '',
         kvr: row.kvr || '',
@@ -304,12 +320,8 @@ function Summary() {
       const response = await api.post('Summary/create', dataToSend);
       
       if (response.data && response.data.id) {
-        setRowData(prevData => prevData.map(item => {
-          if (item.id === row.id) {
-            return { ...row, id: response.data.id, is_new: false };
-          }
-          return item;
-        }));
+        const savedRow = { ...row, id: response.data.id, is_new: false };
+        updateSingleRow(savedRow);
         return true;
       }
       return false;
@@ -319,28 +331,45 @@ function Summary() {
       setRowData(prevData => prevData.filter(item => item.id !== row.id));
       return false;
     }
-  }, []);
+  }, [updateSingleRow]);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;
     if (newValue === oldValue) return;
     
     const updatedRow = { ...data, [colDef.field]: newValue };
-    setRowData(prevData => prevData.map(item => item.id === data.id ? updatedRow : item));
+    
+    updateSingleRow(updatedRow);
+    
+    if (saveTimeoutRef.current) {
+      clearTimeout(saveTimeoutRef.current);
+    }
     
     if (data.is_new) {
-      const hasDocNum = updatedRow.doc_num && updatedRow.doc_num.trim() !== '';
-      if (hasDocNum) {
-        await saveNewRowToDB(updatedRow);
+      const hasAllRequired = 
+        updatedRow.doc_num && updatedRow.doc_num.trim() !== '' &&
+        updatedRow.doc_status && updatedRow.doc_status.trim() !== '' &&
+        updatedRow.doc_date &&
+        updatedRow.total_sum !== undefined && updatedRow.total_sum !== null && updatedRow.total_sum !== '' &&
+        updatedRow.counterparty && updatedRow.counterparty.trim() !== '';
+      
+      if (hasAllRequired) {
+        saveTimeoutRef.current = setTimeout(async () => {
+          await saveNewRowToDB(updatedRow);
+          saveTimeoutRef.current = null;
+        }, 300);
       }
       return;
     }
     
-    const success = await saveToDatabase(updatedRow);
-    if (!success) {
-      setRowData(prevData => prevData.map(item => item.id === data.id ? data : item));
-    }
-  }, [saveToDatabase, saveNewRowToDB]);
+    saveTimeoutRef.current = setTimeout(async () => {
+      const success = await saveToDatabase(updatedRow);
+      if (!success) {
+        updateSingleRow(data); // откат
+      }
+      saveTimeoutRef.current = null;
+    }, 300);
+  }, [saveToDatabase, saveNewRowToDB, updateSingleRow]);
 
   const handleAddRow = useCallback(() => {
     const tempId = -Date.now();
@@ -355,7 +384,6 @@ function Summary() {
       reg_date: null,
       exec_date: null,
       total_sum: 0,
-      contract_type: '',
       counterparty: '',
       contract_sum: 0,
       curr_year_sum: 0,
@@ -425,8 +453,8 @@ function Summary() {
     filter: true,
     resizable: true,
     editable: true,
-    wrapText: true,    
-    autoHeight: true,    
+    wrapText: true,
+    autoHeight: true,
     minWidth: 100,
   };
 
@@ -469,22 +497,24 @@ function Summary() {
       </div>
 
       <div className="summary-grid-container ag-theme-alpine">
-        <AgGridReact
-          ref={gridRef}
-          rowData={rowData}
-          columnDefs={columnDefs}
-          defaultColDef={defaultColDef}
-          rowSelection={{
-            mode: 'multiRow',
-            headerCheckbox: true,
-            enableClickSelection: true,
-          }}
-          animateRows={true}
-          onCellValueChanged={onCellValueChanged}
-          stopEditingWhenCellsLoseFocus={true}
-          singleClickEdit={false}
-          suppressHorizontalScroll={false}
-        />
+      <AgGridReact
+        ref={gridRef}
+        rowData={rowData}
+        columnDefs={columnDefs}
+        defaultColDef={defaultColDef}
+        rowSelection={{
+          mode: 'multiRow',
+          headerCheckbox: true,
+          enableClickSelection: true,
+        }}
+        animateRows={true}
+        onCellValueChanged={onCellValueChanged}
+        stopEditingWhenCellsLoseFocus={true}
+        singleClickEdit={false}
+        suppressHorizontalScroll={false}
+        immutableData={true}                          
+        getRowId={(params) => String(params.data.id)}  
+      />
       </div>
     </div>
   );
