@@ -42,7 +42,7 @@ function BudgetPlan() {
   const [filterKfsr, setFilterKfsr] = useState('');
   const [filterKcsr, setFilterKcsr] = useState('');
   const [filterKcsrName, setFilterKcsrName] = useState('');
-  const [filterContract, setFilterContract] = useState(''); // номер договора (дети)
+  const [filterContract, setFilterContract] = useState(''); 
   
   const [loading, setLoading] = useState(false);
   const [savingRows, setSavingRows] = useState(new Set());

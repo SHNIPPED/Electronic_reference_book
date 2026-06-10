@@ -154,6 +154,56 @@ class SummaryModule {
             throw error;
         }
     }
+
+    static async getContractAdditional(contractId) {
+        const query = 'SELECT * FROM des.contract_additional WHERE contract_id = ?';
+        return new Promise((resolve, reject) => {
+            db.query(query, [contractId], (err, results) => {
+                if (err) reject(err);
+                else resolve(results[0] || null);
+            });
+        });
+    }
+    
+    // Создать запись contract_additional
+    static async createContractAdditional(data) {
+        const { contract_id, approvals_2026, obligations_2027, approvals_2027 } = data;
+        const query = `INSERT INTO des.contract_additional 
+            (contract_id, approvals_2026, obligations_2027, approvals_2027) 
+            VALUES (?, ?, ?, ?)`;
+        const values = [contract_id, approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0];
+        return new Promise((resolve, reject) => {
+            db.query(query, values, (err, res) => {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        });
+    }
+    
+    // Обновить запись contract_additional по id
+    static async updateContractAdditional(id, data) {
+        const { approvals_2026, obligations_2027, approvals_2027 } = data;
+        const query = `UPDATE des.contract_additional SET 
+            approvals_2026 = ?, obligations_2027 = ?, approvals_2027 = ? 
+            WHERE id = ?`;
+        const values = [approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0, id];
+        return new Promise((resolve, reject) => {
+            db.query(query, values, (err, res) => {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        });
+    }
+
+    static async deleteContractAdditionalByContractId(contractId) {
+        const query = 'DELETE FROM des.contract_additional WHERE contract_id = ?';
+        return new Promise((resolve, reject) => {
+            db.query(query, [contractId], (err, res) => {
+                if (err) reject(err);
+                else resolve(res);
+            });
+        });
+    }    
 }
      
 export default SummaryModule;
