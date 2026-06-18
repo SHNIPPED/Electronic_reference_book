@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "./hosts.css";
 import trash from "../pictures/trash.png";
 import edit from "../pictures/edit.png";
-import axios from 'axios';
+import api from "../../api/axiosInstance"
 
 function Hosts() {
   const [fcs, setFCS] = useState("");
@@ -11,8 +11,6 @@ function Hosts() {
   const [editingUser, setEditingUser] = useState(null);
   const [hosts, setHosts] = useState([]);
   const navigate = useNavigate();
-
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -23,7 +21,7 @@ function Hosts() {
 
   const fetchData = async () =>{
     try {
-        const response = await axios.get(baseURL);
+        const response = await api.get('/');
         
         if (response.data && response.data.hosts) {
             setHosts(response.data.hosts);
@@ -56,14 +54,14 @@ function Hosts() {
         let response;
         if (editingUser) {
             console.log(userData)
-            response = await axios.post(
-                `${baseURL}edit/${editingUser.id}`,
+            response = await api.post(
+                `edit/${editingUser.id}`,
                 userData
                
             );
         } else {
-            response = await axios.post(
-                `${baseURL}create`,
+            response = await api.post(
+                `create`,
                 userData
             );
         }
@@ -86,7 +84,7 @@ function Hosts() {
 
   const handleDelete = async (id) => {
     try {
-        const response = await axios.delete(`${baseURL}delete/${id}`);
+        const response = await api.delete(`delete/${id}`);
         
         alert(response.data.message);
         fetchData();

@@ -1,18 +1,16 @@
 import React, { useState ,useEffect} from 'react';
 import './Login.css';
-import axios from 'axios';
+import api from '../../api/axiosInstance.js';
 
 function Login (){
   const [login, setUsername] = useState('');
   const [pwd, setPassword] = useState('');
   const [token, setToken] = useState('');
 
-  const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
-
   const handleLogin = async (e) => {
     e.preventDefault(); 
     try {
-      const response = await axios.post(`${baseURL}login`, { login, pwd });
+      const response = await api.post(`login`, { login, pwd });
       setToken(response.data);
       await localStorage.setItem('token', response.data);
     } catch (error) {

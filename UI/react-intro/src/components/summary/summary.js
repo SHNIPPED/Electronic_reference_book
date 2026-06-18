@@ -1,7 +1,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
+import api from '../../api/axiosInstance.js'; 
 import { useNavigate } from "react-router-dom";
 import { AgGridReact } from 'ag-grid-react';
-import axios from 'axios';
 import SummaryExcelService from './summaryExcelService';
 
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
@@ -150,10 +150,7 @@ function Summary() {
   ]);
 
   const [rowData, setRowData] = useState([]);
-  const baseURL = process.env.REACT_APP_API_URL || 'http://192.168.19.101:3001/';
-  const api = axios.create({ baseURL, headers: { 'Content-Type': 'application/json' } });
 
-  // ---- Загрузка данных и служебок ----
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);

@@ -5,19 +5,18 @@ import qrvk from '../pictures/qrvk.png'
 import up from '../pictures/up.png';
 import { useRef } from "react";
 import logo from '../pictures/DES-PB.png';
-import axios from 'axios';
+import api from '../../api/axiosInstance.js'; 
 
 function PhoneBook(){
     const [phone, setPhone] = useState([]);
     const [searchItem, setSearchItem] =  React.useState('')
     const [groupedPhone, setGroupedPhone] = useState({});
 
-    const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
 
     useEffect(() => {
         const fetchData = async () =>{
             try {
-                const response = await axios.get(`${baseURL}PhoneBook`);
+                const response = await api.get(`PhoneBook`);
                 
                 if (response.data && response.data.phoneBooks) {
                     setPhone(response.data.phoneBooks);

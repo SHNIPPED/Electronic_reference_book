@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useNavigate } from "react-router-dom";
 import { AgGridReact } from 'ag-grid-react';
-import axios from 'axios';
+import api from '../../api/axiosInstance.js'
 import excelService from './excelService.js';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import 'ag-grid-community/styles/ag-grid.css';
@@ -48,8 +48,6 @@ function BudgetPlan() {
   const [savingRows, setSavingRows] = useState(new Set());
   const saveTimeoutRef = useRef(null);
   const navigate = useNavigate();
-  const baseURL = process.env.REACT_APP_API_URL || 'http://192.168.19.101:3001/';
-  const api = axios.create({ baseURL, headers: { 'Content-Type': 'application/json' } });
 
   // Уникальные значения КЦСР для выпадающего списка (из родителей)
   const uniqueKcsrOptions = useMemo(() => {
@@ -89,7 +87,7 @@ function BudgetPlan() {
   const fetchReport = useCallback(async () => {
     setLoading(true);
     try {
-      const res = await api.get('/budget-report/hierarchical');
+      const res = await api.get('budget-report/hierarchical');
       const data = res.data.report || [];
 
       const normalized = data.map(item => ({
@@ -270,7 +268,7 @@ function BudgetPlan() {
       } else if (fieldName === 'approvals_2026') dataToSend.approvals_2026 = Number(newValue) || 0;
       else if (fieldName === 'obligations_2027') dataToSend.obligations_2027 = Number(newValue) || 0;
       else if (fieldName === 'approvals_2027') dataToSend.approvals_2027 = Number(newValue) || 0;
-      await api.post(`/budget-report/update-contract-field/${row.id}`, dataToSend);
+      await api.post(`budget-report/update-contract-field/${row.id}`, dataToSend);
       return true;
     } catch (err) {
       console.error(`Ошибка сохранения ${fieldName}:`, err);

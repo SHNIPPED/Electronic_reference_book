@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import trash from "../pictures/trash.png";
 import edit from "../pictures/edit.png";
-import axios from 'axios';
+import api from '../../api/axiosInstance.js'
 
 function Phone(){
 
@@ -16,11 +16,9 @@ function Phone(){
     const [editingUser, setEditingUser] = useState(null);
     const navigate = useNavigate();
 
-    const baseURL = process.env.REACT_APP_API_URL || 'http://localhost:3001/';
-
     const fetchData = async () => {
         try {
-            const response = await axios.get(`${baseURL}PhoneBook`);
+            const response = await api.get(`PhoneBook`);
             
             if (response.data && response.data.phoneBooks) {
                 sortPeople(response.data.phoneBooks);
@@ -64,14 +62,14 @@ function Phone(){
             let response;
             if (editingUser) {
                 console.log(userData)
-                response = await axios.post(
-                    `${baseURL}PhoneBook/edit/${editingUser.id}`,
+                response = await api.post(
+                    `PhoneBook/edit/${editingUser.id}`,
                     userData
                    
                 );
             } else {
-                response = await axios.post(
-                    `${baseURL}PhoneBook/create`,
+                response = await api.post(
+                    `PhoneBook/create`,
                     userData
                 );
             }
@@ -97,7 +95,7 @@ function Phone(){
     
     const handleDelete = async (id) => {
         try {
-            const response = await axios.delete(`${baseURL}PhoneBook/delete/${id}`);
+            const response = await api.delete(`PhoneBook/delete/${id}`);
             
             alert(response.data.message);
             fetchData();
