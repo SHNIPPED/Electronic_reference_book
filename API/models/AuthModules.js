@@ -1,17 +1,10 @@
-import db from '../config/database.js';
+import {query} from '../config/database.js';
 
-class AuthModule{
+class AuthModule {
 
     static async findByLogin(login) {
-        
-        const query = 'SELECT * FROM des.user WHERE `name` = ?';
-
-        return new Promise((resolve,reject)=>{
-            db.query(query,[login],(error,res) =>{
-                if(error) reject(error);
-                else resolve(res);
-            });
-        })
+        const sql = 'SELECT * FROM des.user WHERE `name` = ?';
+        return await query(sql, [login]);
     }
 }
 export default AuthModule;

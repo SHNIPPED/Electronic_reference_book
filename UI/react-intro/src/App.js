@@ -12,9 +12,7 @@ import Summary from './components/summary/summary';
 import execution from './components/execution/execution';
 import BudgetPlan from './components/budgetPlan/BudgetPlan';
 
-
 function App () {
-  
   return (
       <BrowserRouter>
         <Routes>

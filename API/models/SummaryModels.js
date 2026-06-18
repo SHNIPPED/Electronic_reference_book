@@ -1,22 +1,16 @@
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 
 class SummaryModule {
 
     static async getAll() {
-        const query = `SELECT c.*, 
+        const sql = `SELECT c.*, 
             ca.approvals_2026, 
             ca.obligations_2027, 
             ca.approvals_2027
             FROM des.contracts c
             LEFT JOIN des.contract_additional ca ON c.id = ca.contract_id
             ORDER BY c.id DESC`;
-        
-        return new Promise((resolve, reject) => {
-            db.query(query, (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-            });
-        });
+        return await query(sql);
     }
     
     static async create(contractData) {
@@ -28,7 +22,7 @@ class SummaryModule {
             osnovanie, kcsr, kvr, kosgu, kvfo
         } = contractData;
     
-        const query = `INSERT INTO des.contracts 
+        const sql = `INSERT INTO des.contracts 
             (doc_num, doc_status, doc_date, reg_date, exec_date,
              total_sum, contract_type, counterparty, contract_sum, curr_year_sum,
              exec_curr_year, exec_past_periods, in_execution, advance_sum,
@@ -44,16 +38,12 @@ class SummaryModule {
             osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || ''
         ];
     
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (error, res) => {
-                if (error) {
-                    console.error('Ошибка INSERT в contracts:', error);
-                    reject(error);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
+        try {
+            return await query(sql, values);
+        } catch (error) {
+            console.error('Ошибка INSERT в contracts:', error);
+            throw error;
+        }
     }
     
     static async update(id, contractData) {
@@ -65,7 +55,7 @@ class SummaryModule {
             osnovanie, kcsr, kvr, kosgu, kvfo
         } = contractData;
     
-        const query = `UPDATE des.contracts SET 
+        const sql = `UPDATE des.contracts SET 
             doc_num = ?, doc_status = ?, doc_date = ?, reg_date = ?, 
             exec_date = ?, total_sum = ?, contract_type = ?, counterparty = ?, 
             contract_sum = ?, curr_year_sum = ?, exec_curr_year = ?, 
@@ -82,39 +72,22 @@ class SummaryModule {
             osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || '', id
         ];
     
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (error, res) => {
-                if (error) {
-                    console.error('Ошибка UPDATE в contracts:', error);
-                    reject(error);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
+        try {
+            return await query(sql, values);
+        } catch (error) {
+            console.error('Ошибка UPDATE в contracts:', error);
+            throw error;
+        }
     }
     
     static async delete(id) {
-        const query = 'DELETE FROM des.contracts WHERE id = ?';
-    
-        return new Promise((resolve, reject) => {
-            db.query(query, [id], (error, res) => {
-                if (error) reject(error);
-                else resolve(res);
-            });
-        });
+        const sql = 'DELETE FROM des.contracts WHERE id = ?';
+        return await query(sql, [id]);
     }
 
     static async updateExecDate(id, exec_date) {
-        const query = 'UPDATE des.contracts SET exec_date = ? WHERE id = ?';
-        const values = [exec_date || null, id];
-    
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (error, res) => {
-                if (error) reject(error);
-                else resolve(res);
-            });
-        });
+        const sql = 'UPDATE des.contracts SET exec_date = ? WHERE id = ?';
+        return await query(sql, [exec_date || null, id]);
     }
 
     static async updateContractFields(id, updates) {
@@ -131,7 +104,7 @@ class SummaryModule {
             const setClause = fields.map(f => `${f} = VALUES(${f})`).join(', ');
             const placeholders = fields.map(() => '?').join(', ');
             
-            const query = `
+            const sql = `
                 INSERT INTO des.contract_additional (contract_id, ${fields.join(', ')})
                 VALUES (?, ${placeholders})
                 ON DUPLICATE KEY UPDATE ${setClause}
@@ -139,16 +112,7 @@ class SummaryModule {
             
             const values = [id, ...fields.map(f => updateData[f])];
             
-            return new Promise((resolve, reject) => {
-                db.query(query, values, (error, res) => {
-                    if (error) {
-                        console.error('SQL error in updateContractFields:', error);
-                        reject(error);
-                    } else {
-                        resolve(res);
-                    }
-                });
-            });
+            return await query(sql, values);
         } catch (error) {
             console.error('Error in updateContractFields:', error);
             throw error;
@@ -156,53 +120,30 @@ class SummaryModule {
     }
 
     static async getContractAdditional(contractId) {
-        const query = 'SELECT * FROM des.contract_additional WHERE contract_id = ?';
-        return new Promise((resolve, reject) => {
-            db.query(query, [contractId], (err, results) => {
-                if (err) reject(err);
-                else resolve(results[0] || null);
-            });
-        });
+        const sql = 'SELECT * FROM des.contract_additional WHERE contract_id = ?';
+        const results = await query(sql, [contractId]);
+        return results[0] || null;
     }
     
-    // Создать запись contract_additional
     static async createContractAdditional(data) {
         const { contract_id, approvals_2026, obligations_2027, approvals_2027 } = data;
-        const query = `INSERT INTO des.contract_additional 
+        const sql = `INSERT INTO des.contract_additional 
             (contract_id, approvals_2026, obligations_2027, approvals_2027) 
             VALUES (?, ?, ?, ?)`;
-        const values = [contract_id, approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0];
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (err, res) => {
-                if (err) reject(err);
-                else resolve(res);
-            });
-        });
+        return await query(sql, [contract_id, approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0]);
     }
     
-    // Обновить запись contract_additional по id
     static async updateContractAdditional(id, data) {
         const { approvals_2026, obligations_2027, approvals_2027 } = data;
-        const query = `UPDATE des.contract_additional SET 
+        const sql = `UPDATE des.contract_additional SET 
             approvals_2026 = ?, obligations_2027 = ?, approvals_2027 = ? 
             WHERE id = ?`;
-        const values = [approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0, id];
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (err, res) => {
-                if (err) reject(err);
-                else resolve(res);
-            });
-        });
+        return await query(sql, [approvals_2026 || 0, obligations_2027 || 0, approvals_2027 || 0, id]);
     }
 
     static async deleteContractAdditionalByContractId(contractId) {
-        const query = 'DELETE FROM des.contract_additional WHERE contract_id = ?';
-        return new Promise((resolve, reject) => {
-            db.query(query, [contractId], (err, res) => {
-                if (err) reject(err);
-                else resolve(res);
-            });
-        });
+        const sql = 'DELETE FROM des.contract_additional WHERE contract_id = ?';
+        return await query(sql, [contractId]);
     }    
 }
      

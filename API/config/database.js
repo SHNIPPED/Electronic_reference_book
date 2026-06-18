@@ -1,21 +1,26 @@
-import mysql from 'mysql2';
+import mysql from 'mysql2/promise';
 
-
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST|| "localhost",
-    user: process.env.DB_USER ||"root",
+const pool = mysql.createPool({
+    host: process.env.DB_HOST || "localhost",
+    user: process.env.DB_USER || "root",
     database: process.env.DB_NAME || "des",
     password: process.env.DB_PASSWORD || "Asdfg123",
-    ssl: false
+    ssl: false,
+    waitForConnections: true,
+    connectionLimit: 10,          
+    queueLimit: 0,               
+    enableKeepAlive: true,        
+    keepAliveInitialDelay: 10000  
 });
 
-connection.connect((error)=>{
-    if(error){
-        console.log('Ошибка подключения к БД:',error);
-        return;
+export async function query(sql, params = []) {
+    try {
+        const [rows] = await pool.query(sql, params);
+        return rows;
+    } catch (err) {
+        console.error('Ошибка выполнения запроса:', err.message);
+        throw err;
     }
+}
 
-    console.log('Успешное подключение к БД');
-});
-
-export default connection;
+export { pool };

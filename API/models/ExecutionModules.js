@@ -1,16 +1,10 @@
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 
 class ExecutionModule {
 
     static async getAll() {
-        const query = "SELECT * FROM des.execution";
-    
-        return new Promise((resolve, reject) => {
-            db.query(query, (error, result) => {
-                if (error) reject(error);
-                else resolve(result);
-            });
-        });
+        const sql = "SELECT * FROM des.execution";
+        return await query(sql);
     }
 
     static async create(executionData) {
@@ -19,7 +13,7 @@ class ExecutionModule {
             payment_plan_2026, payment_plan_2027, payment_plan_2028
         } = executionData;
     
-        const query = `INSERT INTO des.execution 
+        const sql = `INSERT INTO des.execution 
             (kfsr, kcsr, kvr, kosgu, kvfo,
              payment_plan_2026, payment_plan_2027, payment_plan_2028) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
@@ -35,19 +29,10 @@ class ExecutionModule {
             Number(payment_plan_2028) || 0
         ];
     
-        console.log('SQL INSERT:', query);
+        console.log('SQL INSERT:', sql);
         console.log('Values:', values);
     
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (error, res) => {
-                if (error) {
-                    console.error('Ошибка INSERT:', error);
-                    reject(error);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
+        return await query(sql, values);
     }
 
     static async update(id, executionData) {
@@ -56,7 +41,7 @@ class ExecutionModule {
             payment_plan_2026, payment_plan_2027, payment_plan_2028
         } = executionData;
     
-        const query = `UPDATE des.execution SET 
+        const sql = `UPDATE des.execution SET 
             kfsr = ?, kcsr = ?, kvr = ?, kosgu = ?, kvfo = ?,
             payment_plan_2026 = ?, payment_plan_2027 = ?, payment_plan_2028 = ?
             WHERE id = ?`;
@@ -73,27 +58,15 @@ class ExecutionModule {
             id
         ];
     
-        return new Promise((resolve, reject) => {
-            db.query(query, values, (error, res) => {
-                if (error) {
-                    console.error('Ошибка UPDATE:', error);
-                    reject(error);
-                } else {
-                    resolve(res);
-                }
-            });
-        });
+        console.log('SQL UPDATE:', sql);
+        console.log('Values:', values);
+    
+        return await query(sql, values);
     }
 
     static async delete(id) {
-        const query = 'DELETE FROM des.execution WHERE id = ?';
-    
-        return new Promise((resolve, reject) => {
-            db.query(query, [id], (error, res) => {
-                if (error) reject(error);
-                else resolve(res);
-            });
-        });
+        const sql = 'DELETE FROM des.execution WHERE id = ?';
+        return await query(sql, [id]);
     }
 }
      

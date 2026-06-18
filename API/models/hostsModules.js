@@ -1,50 +1,27 @@
-import db from '../config/database.js';
+import { query } from '../config/database.js';
 
-class HostsModule{
-    static async getAll(){
-        const query = "SELECT * FROM des.hosts";
+class HostsModule {
 
-        return new Promise((resolve,reject)=>{
-            db.query(query,(error,result)=>{
-                if(error) reject(error);
-                else resolve(result);
-            });
-        });
+    static async getAll() {
+        const sql = "SELECT * FROM des.hosts";
+        return await query(sql);
     }
 
-    static async create(hostData){
-        const{fcs, host} = hostData;
-        const query = "INSERT INTO `des`.`hosts` (`fcs`, `host`) VALUES (?, ?);";
-
-        return new Promise((resolve,reject)=>{
-            db.query(query,[fcs, host],(error,res) =>{
-                if(error) reject(error);
-                else resolve(res);
-            });
-        });
-    }
-
-    static async update(id,hostData){
+    static async create(hostData) {
         const { fcs, host } = hostData;
-        const query = 'UPDATE des.hosts SET `fcs` = ?, `host` = ? WHERE (`id` = ?);';
-
-        return new Promise((resolve,reject)=>{
-            db.query(query,[fcs, host, id],(error,res) =>{
-                if(error) reject(error);
-                else resolve(res);
-            });
-        });
+        const sql = "INSERT INTO `des`.`hosts` (`fcs`, `host`) VALUES (?, ?)";
+        return await query(sql, [fcs, host]);
     }
 
-    static async delete(id){ 
-        const query = 'DELETE FROM des.hosts WHERE id = ?';
+    static async update(id, hostData) {
+        const { fcs, host } = hostData;
+        const sql = "UPDATE des.hosts SET `fcs` = ?, `host` = ? WHERE `id` = ?";
+        return await query(sql, [fcs, host, id]);
+    }
 
-        return new Promise((resolve,reject)=>{
-            db.query(query, id, (error, res)=>{
-                if(error) reject(error);
-                else resolve(res);
-            });
-        });
+    static async delete(id) {
+        const sql = "DELETE FROM des.hosts WHERE id = ?";
+        return await query(sql, [id]);
     }
 }
 
