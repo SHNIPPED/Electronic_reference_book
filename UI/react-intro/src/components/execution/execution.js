@@ -48,6 +48,7 @@ function Execution() {
     { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
     { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true },
     { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true },
+    { headerName: 'Отраслевой код', field: 'Industry_code', width: 320, editable: true, resizable: true },
     { 
       headerName: 'Выплаты - План с изменениями 2026', 
       field: 'payment_plan_2026', 
@@ -155,7 +156,7 @@ function Execution() {
   const handleImport = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    if (!file.name.match(/\.(xlt)$/i)) {
+    if (!file.name.match(/\.(xlsx)$/i)) {
       alert('Пожалуйста, выберите файл Excel (.xlt)');
       return;
     }

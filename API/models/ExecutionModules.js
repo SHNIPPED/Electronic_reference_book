@@ -10,13 +10,13 @@ class ExecutionModule {
     static async create(executionData) {
         const {
             kfsr, kcsr, kvr, kosgu, kvfo,
-            payment_plan_2026, payment_plan_2027, payment_plan_2028
+            payment_plan_2026, payment_plan_2027, payment_plan_2028, Industry_code
         } = executionData;
     
         const sql = `INSERT INTO des.execution 
             (kfsr, kcsr, kvr, kosgu, kvfo,
-             payment_plan_2026, payment_plan_2027, payment_plan_2028) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)`;
+             payment_plan_2026, payment_plan_2027, payment_plan_2028 , Industry_code) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
         const values = [
             String(kfsr || ''), 
@@ -26,7 +26,8 @@ class ExecutionModule {
             String(kvfo || ''),
             Number(payment_plan_2026) || 0, 
             Number(payment_plan_2027) || 0, 
-            Number(payment_plan_2028) || 0
+            Number(payment_plan_2028) || 0,
+            String(Industry_code || ' ')
         ];
     
         console.log('SQL INSERT:', sql);
@@ -38,12 +39,13 @@ class ExecutionModule {
     static async update(id, executionData) {
         const {
             kfsr, kcsr, kvr, kosgu, kvfo,
-            payment_plan_2026, payment_plan_2027, payment_plan_2028
+            payment_plan_2026, payment_plan_2027, payment_plan_2028,Industry_code
         } = executionData;
     
         const sql = `UPDATE des.execution SET 
             kfsr = ?, kcsr = ?, kvr = ?, kosgu = ?, kvfo = ?,
-            payment_plan_2026 = ?, payment_plan_2027 = ?, payment_plan_2028 = ?
+            payment_plan_2026 = ?, payment_plan_2027 = ?, 
+            payment_plan_2028 = ?, Industry_code = ?
             WHERE id = ?`;
     
         const values = [
@@ -55,6 +57,7 @@ class ExecutionModule {
             Number(payment_plan_2026) || 0, 
             Number(payment_plan_2027) || 0, 
             Number(payment_plan_2028) || 0,
+            String(Industry_code || ' '),
             id
         ];
     

@@ -115,13 +115,13 @@ function Summary() {
     kvr: '',
     kosgu: '',
     kvfo: '',
+    Industry_code: '' ,
     is_service: false,
     approvals_2026: 0,
     obligations_2027: 0,
     approvals_2027: 0,
     service_id: null
   });
-
   const [columnDefs] = useState([
     { headerName: 'Номер документа', field: 'doc_num', width: 180, pinned: 'left', editable: true, resizable: true },
     { headerName: 'Статус документа', field: 'doc_status', width: 150, editable: true, resizable: true },
@@ -146,6 +146,7 @@ function Summary() {
     { headerName: 'КВР', field: 'kvr', width: 100, editable: true, resizable: true },
     { headerName: 'КОСГУ', field: 'kosgu', width: 100, editable: true, resizable: true },
     { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true },
+    { headerName: 'Отраслевой код', field: 'Industry_code', width: 100, editable: true, resizable: true },
     { headerName: 'Служебка', field: 'is_service', width: 100, cellRenderer: (params) => params.value ? '✅' : '❌', editable: false }
   ]);
 
@@ -240,7 +241,8 @@ function Summary() {
         kcsr: row.kcsr || '',
         kvr: row.kvr || '',
         kosgu: row.kosgu || '',
-        kvfo: row.kvfo || ''
+        kvfo: row.kvfo || '',
+        Industry_code: row.Industry_code || ''
       };
       await api.post(`Summary/edit/${row.id}`, dataToSend);
       return true;
@@ -336,6 +338,7 @@ function Summary() {
       kvr: '',
       kosgu: '',
       kvfo: '',
+      Industry_code: '',
       is_service: false,
       approvals_2026: 0,
       obligations_2027: 0,
@@ -371,6 +374,7 @@ function Summary() {
       kvr: contract.kvr || '',
       kosgu: contract.kosgu || '',
       kvfo: contract.kvfo || '',
+      Industry_code: contract.Industry_code || '',
       is_service: contract.is_service || false,
       approvals_2026: contract.approvals_2026 || 0,
       obligations_2027: contract.obligations_2027 || 0,
@@ -441,7 +445,8 @@ function Summary() {
         kcsr: contractForm.kcsr,
         kvr: contractForm.kvr,
         kosgu: contractForm.kosgu,
-        kvfo: contractForm.kvfo
+        kvfo: contractForm.kvfo,
+        Industry_code: contractForm.Industry_code
       };
 
       let savedContract;
@@ -599,6 +604,9 @@ function Summary() {
 
               <label>КВФО</label>
               <input name="kvfo" value={contractForm.kvfo} onChange={handleFormChange} />
+
+              <label>Отраслевой код</label>
+              <input name="Industry_code" value={contractForm.Industry_code} onChange={handleFormChange} />
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginTop: '15px' }}>
                 <label style={{ margin: 0 }}>Служебка</label>

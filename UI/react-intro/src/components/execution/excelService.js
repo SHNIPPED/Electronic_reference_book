@@ -31,8 +31,6 @@ class ExcelService {
             blankrows: false 
           });
           
-          console.log('Всего строк в файле:', rows.length);
-          console.log('Первые 5 строк:', rows.slice(0, 5));
           
           let startRow = -1;
           for (let i = 0; i < rows.length; i++) {
@@ -91,7 +89,8 @@ class ExcelService {
               kvfo: row[4] ? String(row[4]).trim() : '',
               payment_plan_2026: payment2026,
               payment_plan_2027: payment2027,
-              payment_plan_2028: payment2028
+              payment_plan_2028: payment2028,
+              Industry_code: row[8] ? String(row[8]).trim(): ''
             };
             
             results.push(record);
@@ -109,7 +108,7 @@ class ExcelService {
           const existingMap = new Map();
           
           existingData.forEach(item => {
-            const key = `${item.kfsr}|${item.kcsr}|${item.kvr}|${item.kosgu}|${item.kvfo}`;
+            const key = `${item.kfsr}|${item.kcsr}|${item.kvr}|${item.kosgu}|${item.kvfo}|${item.Industry_code}`;
             existingMap.set(key, item);
           });
           
@@ -118,7 +117,7 @@ class ExcelService {
           const errors = [];
           
           for (const record of results) {
-            const key = `${record.kfsr}|${record.kcsr}|${record.kvr}|${record.kosgu}|${record.kvfo}`;
+            const key = `${record.kfsr}|${record.kcsr}|${record.kvr}|${record.kosgu}|${record.kvfo}|${record.Industry_code}`;
             
             try {
               if (existingMap.has(key)) {

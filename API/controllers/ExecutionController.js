@@ -18,9 +18,9 @@ class ExecutionController {
             const executionData = req.body;
             
             if (!executionData.kfsr || !executionData.kcsr || !executionData.kvr || 
-                !executionData.kosgu || !executionData.kvfo) {
+                !executionData.kosgu || !executionData.kvfo || !executionData.Industry_code) {
                 return res.status(400).json({ 
-                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo' 
+                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo,Industry_code' 
                 });
             }
     
@@ -52,9 +52,9 @@ class ExecutionController {
             }
 
             if (!executionData.kfsr || !executionData.kcsr || !executionData.kvr || 
-                !executionData.kosgu || !executionData.kvfo) {
+                !executionData.kosgu || !executionData.kvfo|| !executionData.Industry_code) {
                 return res.status(400).json({ 
-                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo' 
+                    message: 'Необходимо заполнить все обязательные поля: kfsr, kcsr, kvr, kosgu, kvfo,Industry_code' 
                 });
             }
 

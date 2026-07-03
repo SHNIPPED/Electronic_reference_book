@@ -103,7 +103,8 @@ class SummaryExcelService {
       kcsr: -1,           // КЦСР
       kvr: -1,            // КВР
       kosgu: -1,          // КОСГУ (добавить)
-      kvfo: -1            // КВФО
+      kvfo: -1,            // КВФО
+      Industry_code: -1
     };
     
     headers.forEach((header, idx) => {
@@ -133,6 +134,7 @@ class SummaryExcelService {
       else if (headerStr === 'КВР') indexes.kvr = idx;
       else if (headerStr === 'КОСГУ') indexes.kosgu = idx;  
       else if (headerStr === 'КВФО') indexes.kvfo = idx;
+      else if (headerStr === 'Отраслевой код') indexes.Industry_code = idx;
     });
     
     return indexes;
@@ -185,7 +187,8 @@ class SummaryExcelService {
         kcsr: row[colIndexes.kcsr] ? String(row[colIndexes.kcsr]).trim() : '',
         kvr: row[colIndexes.kvr] ? String(row[colIndexes.kvr]).trim() : '',
         kosgu: row[colIndexes.kosgu] ? String(row[colIndexes.kosgu]).trim() : '',
-        kvfo: row[colIndexes.kvfo] ? String(row[colIndexes.kvfo]).trim() : ''
+        kvfo: row[colIndexes.kvfo] ? String(row[colIndexes.kvfo]).trim() : '',
+        Industry_code: row[colIndexes.Industry_code] ? String(row[colIndexes.Industry_code]).trim() : ''
       };
       
       results.push(record);
