@@ -93,6 +93,7 @@ function Summary() {
   const [editingContract, setEditingContract] = useState(null);
   const [contractForm, setContractForm] = useState({
     doc_num: '',
+    note: '',
     doc_status: 'Черновик',
     doc_date: new Date().toISOString().split('T')[0],
     reg_date: '',
@@ -121,8 +122,10 @@ function Summary() {
     obligations_2027: 0,
     approvals_2027: 0,
     service_id: null
+
   });
   const [columnDefs] = useState([
+    { headerName: 'Примечание', field: 'note', width: 180, pinned: 'left', editable: true, resizable: true  },
     { headerName: 'Номер документа', field: 'doc_num', width: 180, pinned: 'left', editable: true, resizable: true },
     { headerName: 'Статус документа', field: 'doc_status', width: 150, editable: true, resizable: true },
     { headerName: 'Дата документа', field: 'doc_date', width: 140, editable: true, cellEditor: SimpleTextEditor, valueFormatter: (params) => formatDate(params.value), resizable: true },
@@ -135,6 +138,8 @@ function Summary() {
     { headerName: 'Исполнено в тек. году', field: 'exec_curr_year', width: 180, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
     { headerName: 'Исполнено в прошлых периодах', field: 'exec_past_periods', width: 220, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
     { headerName: 'В исполнении', field: 'in_execution', width: 140, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
+    // 2-й год исп
+    // 3-й год исп
     { headerName: 'Сумма аванса', field: 'advance_sum', width: 140, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
     { headerName: 'Остаток', field: 'balance', width: 130, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
     { headerName: 'Общий остаток', field: 'total_balance', width: 150, editable: true, valueFormatter: formatNumber, cellDataType: 'number', resizable: true },
@@ -219,6 +224,7 @@ function Summary() {
       };
       const dataToSend = {
         doc_num: row.doc_num || '',
+        note: row.note || '',
         doc_status: row.doc_status || 'Черновик',
         doc_date: formatDateForMySQL(row.doc_date) || formatDateForMySQL(new Date()),
         reg_date: formatDateForMySQL(row.reg_date),
@@ -316,7 +322,8 @@ function Summary() {
     setEditingContract(null);
     setContractForm({
       doc_num: '',
-      doc_status: 'Черновик',
+      note: '',
+      doc_status: 'Черновик',  
       doc_date: new Date().toISOString().split('T')[0],
       reg_date: '',
       exec_date: '',
@@ -352,6 +359,7 @@ function Summary() {
     setEditingContract(contract);
     setContractForm({
       doc_num: contract.doc_num || '',
+      note: contract.note || '',
       doc_status: contract.doc_status || 'Черновик',
       doc_date: contract.doc_date ? contract.doc_date.split('T')[0] : new Date().toISOString().split('T')[0],
       reg_date: contract.reg_date ? contract.reg_date.split('T')[0] : '',
@@ -419,6 +427,7 @@ function Summary() {
 
       const contractPayload = {
         doc_num: contractForm.doc_num.trim(),
+        note:contractForm.note.trim(),
         doc_status: contractForm.doc_status,
         doc_date: formatDateForMySQL(contractForm.doc_date) || formatDateForMySQL(new Date()),
         reg_date: formatDateForMySQL(contractForm.reg_date),
@@ -538,6 +547,9 @@ function Summary() {
             <div className="modal-form">
               <label>Номер документа *</label>
               <input name="doc_num" value={contractForm.doc_num} onChange={handleFormChange} />
+
+              <label>Примечание</label>
+              <input name="note" value={contractForm.note} onChange={handleFormChange} />
 
               <label>Статус документа</label>
               <input type="text" name="doc_status" value={contractForm.doc_status} onChange={handleFormChange} placeholder="Введите статус" />

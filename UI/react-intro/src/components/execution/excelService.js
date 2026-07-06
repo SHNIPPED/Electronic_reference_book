@@ -66,9 +66,9 @@ class ExcelService {
               continue;
             }
             
-            let payment2026 = row[5] ? this.parseNumber(row[5]) : 0;
-            let payment2027 = row[6] ? this.parseNumber(row[6]) : 0;
-            let payment2028 = row[7] ? this.parseNumber(row[7]) : 0;
+            let payment2026 = row[6] ? this.parseNumber(row[6]) : 0;
+            let payment2027 = row[7] ? this.parseNumber(row[7]) : 0;
+            let payment2028 = row[8] ? this.parseNumber(row[8]) : 0;
             
             if (payment2026 === 0 && payment2027 === 0 && payment2028 === 0) {
               for (let j = 0; j < row.length; j++) {
@@ -87,10 +87,10 @@ class ExcelService {
               kvr: row[2] ? String(row[2]).trim() : '',
               kosgu: row[3] ? String(row[3]).trim() : '',
               kvfo: row[4] ? String(row[4]).trim() : '',
+              Industry_code: row[5] ? String(row[5]).trim(): '',
               payment_plan_2026: payment2026,
               payment_plan_2027: payment2027,
-              payment_plan_2028: payment2028,
-              Industry_code: row[8] ? String(row[8]).trim(): ''
+              payment_plan_2028: payment2028
             };
             
             results.push(record);

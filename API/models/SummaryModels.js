@@ -19,7 +19,7 @@ class SummaryModule {
             total_sum, contract_type, counterparty, contract_sum, curr_year_sum,
             exec_curr_year, exec_past_periods, in_execution, advance_sum,
             balance, total_balance, base_doc_date, start_date, end_date,
-            osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code
+            osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code, note
         } = contractData;
     
         const sql = `INSERT INTO des.contracts 
@@ -27,15 +27,15 @@ class SummaryModule {
              total_sum, contract_type, counterparty, contract_sum, curr_year_sum,
              exec_curr_year, exec_past_periods, in_execution, advance_sum,
              balance, total_balance, base_doc_date, start_date, end_date,
-             osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+             osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code, note) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
     
         const values = [
             doc_num || '', doc_status || '', doc_date || null, reg_date || null, exec_date || null,
             total_sum || 0, contract_type || '', counterparty || '', contract_sum || 0, curr_year_sum || 0,
             exec_curr_year || 0, exec_past_periods || 0, in_execution || 0, advance_sum || 0,
             balance || 0, total_balance || 0, base_doc_date || null, start_date || null, end_date || null,
-            osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || '' , Industry_code || ''
+            osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || '' , Industry_code || '' , note || ' '
         ];
     
         try {
@@ -52,7 +52,7 @@ class SummaryModule {
             total_sum, contract_type, counterparty, contract_sum, curr_year_sum,
             exec_curr_year, exec_past_periods, in_execution, advance_sum,
             balance, total_balance, base_doc_date, start_date, end_date,
-            osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code
+            osnovanie, kcsr, kvr, kosgu, kvfo, Industry_code, note ,
         } = contractData;
     
         const sql = `UPDATE des.contracts SET 
@@ -61,7 +61,7 @@ class SummaryModule {
             contract_sum = ?, curr_year_sum = ?, exec_curr_year = ?, 
             exec_past_periods = ?, in_execution = ?, advance_sum = ?, 
             balance = ?, total_balance = ?, base_doc_date = ?, 
-            start_date = ?, end_date = ?, osnovanie = ?, kcsr = ?, kvr = ?, kosgu = ?, kvfo = ? , Industry_code = ? 
+            start_date = ?, end_date = ?, osnovanie = ?, kcsr = ?, kvr = ?, kosgu = ?, kvfo = ?, Industry_code = ?, note = ? 
             WHERE id = ?`;
     
         const values = [
@@ -69,7 +69,7 @@ class SummaryModule {
             total_sum || 0, contract_type || '', counterparty || '', contract_sum || 0, curr_year_sum || 0,
             exec_curr_year || 0, exec_past_periods || 0, in_execution || 0, advance_sum || 0,
             balance || 0, total_balance || 0, base_doc_date || null, start_date || null, end_date || null,
-            osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || '', Industry_code || '', id
+            osnovanie || '', kcsr || '', kvr || '', kosgu || '', kvfo || '', Industry_code || '',note  || '', id
         ];
     
         try {

@@ -310,6 +310,7 @@ function BudgetPlan() {
     { field: 'kvr', headerName: 'КВР', width: 100 },
     { field: 'kosgu', headerName: 'КОСГУ', width: 100 },
     { field: 'kvfo', headerName: 'КВФО', width: 100 },
+    { field: 'Industry_code', headerName: 'Отраслевой код', with: 300},
     { field: 'counterparty', headerName: 'Организация контрагента', width: 300, wrapText: true, autoHeight: true },
     { field: 'doc_date', headerName: 'дата договора', width: 120, valueFormatter: formatDate },
     { field: 'start_date', headerName: 'начало оказания услуг', width: 150, valueFormatter: formatDate },

@@ -24,7 +24,7 @@ class ExcelExportService {
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet('Бюджетный отчет');
 
-    // Колонки (20 штук)
+    // Колонки (21 штука)
     const columns = [
       { header: 'КФСР', key: 'kfsr', width: 8 },
       { header: 'КЦСР', key: 'kcsr', width: 18 },

@@ -9,7 +9,7 @@ class BudgetReportController {
     
             const contractsByKey = new Map();
             contracts.forEach(contract => {
-                const key = `${contract.kcsr || ''}|${contract.kvr || ''}|${contract.kosgu || ''}|${contract.kvfo || ''}`;
+                const key = `${contract.kcsr || ''}|${contract.kvr || ''}|${contract.kosgu || ''}|${contract.kvfo || ''}|${contract.Industry_code || ''}`;
                 if (!contractsByKey.has(key)) contractsByKey.set(key, []);
                 contractsByKey.get(key).push(contract);
             });
@@ -17,7 +17,7 @@ class BudgetReportController {
             const flatRows = [];
             for (const exec of executions) {
                 const parentId = `parent_${exec.id}`;
-                const childKey = `${exec.kcsr || ''}|${exec.kvr || ''}|${exec.kosgu || ''}|${exec.kvfo || ''}`;
+                const childKey = `${exec.kcsr || ''}|${exec.kvr || ''}|${exec.kosgu || ''}|${exec.kvfo || ''}|${exec.Industry_code || ''}`;
                 const children = contractsByKey.get(childKey) || [];
     
                 let totalExecCurrYear = 0;
@@ -66,6 +66,7 @@ class BudgetReportController {
                     approvals_2027: totalApprovals2027,
                     advance_sum: totalAdvanceSum,
                     kcsr_name: '',
+                    Industry_code: exec.Industry_code,
                 });
     
                 // Дочерние строки - добавляем parentId
@@ -100,6 +101,7 @@ class BudgetReportController {
                         obligations_2027: child.obligations_2027 || 0,
                         approvals_2027: child.approvals_2027 || 0,
                         advance_sum: childAdvance,
+                        Industry_code: child.Industry_code,
                     });
                 });
             }

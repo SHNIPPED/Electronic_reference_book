@@ -50,7 +50,7 @@ function Execution() {
     { headerName: 'КВФО', field: 'kvfo', width: 100, editable: true, resizable: true },
     { headerName: 'Отраслевой код', field: 'Industry_code', width: 320, editable: true, resizable: true },
     { 
-      headerName: 'Выплаты - План с изменениями 2026', 
+      headerName: 'Выплаты - План с изменениями текущего года', 
       field: 'payment_plan_2026', 
       width: 320,
       editable: true,
@@ -63,7 +63,7 @@ function Execution() {
       resizable: true 
     },
     { 
-      headerName: 'Выплаты - План с изменениями 2027', 
+      headerName: 'Выплаты - План с изменениями второго года', 
       field: 'payment_plan_2027', 
       width: 320,
       editable: true,
@@ -76,7 +76,7 @@ function Execution() {
       resizable: true 
     },
     { 
-      headerName: 'Выплаты - План с изменениями 2028', 
+      headerName: 'Выплаты - План с изменениями третьего года', 
       field: 'payment_plan_2028', 
       width: 320,
       editable: true,
@@ -156,7 +156,7 @@ function Execution() {
   const handleImport = useCallback(async (event) => {
     const file = event.target.files[0];
     if (!file) return;
-    if (!file.name.match(/\.(xlsx)$/i)) {
+    if (!file.name.match(/\.(xlt)$/i)) {
       alert('Пожалуйста, выберите файл Excel (.xlt)');
       return;
     }
