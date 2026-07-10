@@ -43,6 +43,36 @@ class SummaryController{
         }
     }
 
+    static async createSummary(req, res) {
+        try {
+            const summaryData = req.body;
+            
+            // Проверка обязательных полей (КОСГУ не обязательный)
+            if (!summaryData.doc_num || !summaryData.kcsr || !summaryData.kvr || 
+                !summaryData.kosgu || !summaryData.kvfo || !summaryData.in_execution) {
+                return res.status(400).json({ 
+                    message: `Необходимо заполнить все обязательные поля ${summaryData.kcsr}` 
+                });
+            }
+    
+            const result = await SummaryModule.createSummary(summaryData);
+    
+            if (result && result.affectedRows > 0) {
+                return res.status(200).json({
+                    message: `Добавлен контракт: ${result.affectedRows}`,
+                    id: result.insertId 
+                });
+            } 
+            else {
+                return res.status(404).json({ message: 'Контракт не добавлен' });
+            }
+        }
+        catch(error) {
+            console.error('Ошибка при добавлении контракта:', error);
+            return res.status(500).json({ message: 'Ошибка сервера' });
+        }
+    }
+
     static async update(req, res) {
         try {
             const { id } = req.params;
@@ -60,6 +90,71 @@ class SummaryController{
             }
 
             const result = await SummaryModule.update(id, summaryData);
+
+            if (result && result.affectedRows > 0) {
+                return res.status(200).json({ 
+                    message: `Изменен контракт: ${result.affectedRows}`
+                });
+            } 
+            else {
+                return res.status(404).json({ message: 'Контракт не изменен' });
+            }
+        }
+        catch(error) {
+            console.error('Ошибка при изменении контракта:', error);
+            return res.status(500).json({ message: 'Ошибка сервера' });
+        }
+    }
+
+    static async updateSingle(req, res) {
+        try {
+            const { id } = req.params;
+            const summaryData = req.body;
+
+            if (isNaN(id)) {
+                return res.status(400).json({ message: 'Некорректный ID' });
+            }
+
+            if (!summaryData.doc_num || !summaryData.doc_status || !summaryData.doc_date || 
+                !summaryData.total_sum || !summaryData.counterparty || !summaryData.end_date) {
+                return res.status(400).json({ 
+                    message: 'Необходимо заполнить все обязательные поля: doc_num, doc_status, doc_date, total_sum, counterparty, end_date' 
+                });
+            }
+
+            const result = await SummaryModule.updateSingle(id, summaryData);
+
+            if (result && result.affectedRows > 0) {
+                return res.status(200).json({ 
+                    message: `Изменен контракт: ${result.affectedRows}`
+                });
+            } 
+            else {
+                return res.status(404).json({ message: 'Контракт не изменен' });
+            }
+        }
+        catch(error) {
+            console.error('Ошибка при изменении контракта:', error);
+            return res.status(500).json({ message: 'Ошибка сервера' });
+        }
+    }
+
+    static async updateExecution(req,res){
+        try {
+            const { id } = req.params;
+            const summaryData = req.body;
+
+            if (isNaN(id)) {
+                return res.status(400).json({ message: 'Некорректный ID' });
+            }
+
+            if (!summaryData.in_execution) {
+                return res.status(400).json({ 
+                    message: 'Необходимо заполнить все обязательные поля' 
+                });
+            }
+
+            const result = await SummaryModule.updateExecution(id, summaryData);
 
             if (result && result.affectedRows > 0) {
                 return res.status(200).json({ 
@@ -98,6 +193,16 @@ class SummaryController{
         catch(error) {
             console.error('Ошибка при удалении контракта:', error);
             return res.status(500).json({ message: 'Ошибка сервера' });
+        }
+    }
+
+    static async deleteAllSummary(req,res){
+        try {
+            const result = await SummaryModule.deleteAllSummary();
+            res.status(200).json({ message: 'Все записи удалены', affectedRows: result.affectedRows });
+        } catch (error) {
+            console.error(error);
+            res.status(500).json({ message: 'Ошибка при удалении' });
         }
     }
 }

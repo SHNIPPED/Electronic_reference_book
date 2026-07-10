@@ -140,6 +140,30 @@ class SummaryExcelService {
     return indexes;
   }
 
+  static getColumnIndexesSummary(headers) {
+    const indexes = {
+      doc_num: -1,        // Номер документа
+      in_execution: -1,   // В исполнении
+      kcsr: -1,           // КЦСР
+      kvr: -1,            // КВР
+      kosgu: -1,          // КОСГУ (добавить)
+      kvfo: -1,            // КВФО
+    };
+    
+    headers.forEach((header, idx) => {
+      const headerStr = String(header || '').trim();
+      
+      if (headerStr === 'Номер договора') indexes.doc_num = idx;
+      else if (headerStr === 'Сумма поставки') indexes.in_execution = idx;
+      else if (headerStr === 'КЦСР') indexes.kcsr = idx;
+      else if (headerStr === 'КВР') indexes.kvr = idx;
+      else if (headerStr === 'КОСГУ') indexes.kosgu = idx;  
+      else if (headerStr === 'КВФО') indexes.kvfo = idx;
+    });
+    
+    return indexes;
+  }
+
   // Парсинг данных таблицы
   static parseTableData(rows, startRow, colIndexes) {
     const results = [];
@@ -189,6 +213,35 @@ class SummaryExcelService {
         kosgu: row[colIndexes.kosgu] ? String(row[colIndexes.kosgu]).trim() : '',
         kvfo: row[colIndexes.kvfo] ? String(row[colIndexes.kvfo]).trim() : '',
         Industry_code: row[colIndexes.Industry_code] ? String(row[colIndexes.Industry_code]).trim() : ''
+      };
+      
+      results.push(record);
+    }
+    
+    return results;
+  }
+
+  static parseSummaryTableData(rows, startRow, colIndexes) {
+    const results = [];
+    
+    for (let i = startRow; i < rows.length; i++) {
+      const row = rows[i];
+      if (!row || row.length === 0) continue;
+      
+      const doc_num = row[colIndexes.doc_num] ? String(row[colIndexes.doc_num]).trim() : '';
+
+      if (!doc_num || doc_num === 'Итого:' || doc_num === 'Итого') {
+        continue;
+      }
+      
+      
+      const record = {
+        doc_num: doc_num,
+        in_execution: this.parseNumber(row[colIndexes.in_execution]),
+        kcsr: row[colIndexes.kcsr] ? String(row[colIndexes.kcsr]).trim() : '',
+        kvr: row[colIndexes.kvr] ? String(row[colIndexes.kvr]).trim() : '',
+        kosgu: row[colIndexes.kosgu] ? String(row[colIndexes.kosgu]).trim() : '',
+        kvfo: row[colIndexes.kvfo] ? String(row[colIndexes.kvfo]).trim() : '',
       };
       
       results.push(record);
@@ -276,6 +329,111 @@ class SummaryExcelService {
       }
     }
 
+    return results;
+  }
+
+  static async importSummaryFromExcel(file, api) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      
+      reader.onload = async (e) => {
+        try {
+          const data = new Uint8Array(e.target.result);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          
+          // Получаем все данные как массив массивов
+          const rows = XLSX.utils.sheet_to_json(firstSheet, { 
+            header: 1, 
+            defval: '',
+            blankrows: false 
+          });
+          
+          console.log('Всего строк в файле:', rows.length);
+          
+          // Ищем строку с заголовками
+          let startRow = -1;
+          let headers = null;
+          
+          for (let i = 0; i < rows.length; i++) {
+            const row = rows[i];
+            if (!row) continue;
+            
+            // Ищем строку с заголовком "т"
+            for (let j = 0; j < row.length; j++) {
+              const cell = row[j];
+              if (cell && String(cell).trim() === 'т') {
+                startRow = i + 1;
+                headers = row;
+                console.log('Найдена строка с заголовками на строке:', i);
+                break;
+              }
+            }
+            if (startRow !== -1) break;
+          }
+          
+          if (startRow === -1) {
+            reject(new Error('Не найдена строка с заголовками'));
+            return;
+          }
+          
+          // Находим индексы колонок
+          const colIndexes = this.getColumnIndexesSummary(headers);
+          console.log('Индексы колонок:', colIndexes);
+          
+          // Парсим данные
+          const parsedData = this.parseSummaryTableData(rows, startRow, colIndexes);
+          
+          console.log('Распарсено записей:', parsedData.length);
+          console.log('Первые 3 записи:', parsedData.slice(0, 3));
+          
+          if (parsedData.length === 0) {
+            reject(new Error('Не найдено данных для импорта'));
+            return;
+          }
+          
+          //Синхронизация с БД
+          const results = await this.syncDataSummary(parsedData, api);
+          resolve(results);
+          
+        } catch (error) {
+          console.error('Ошибка чтения файла:', error);
+          reject(error);
+        }
+      };
+      
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  static async syncDataSummary(newData, api) {
+    const results = {
+      updated: 0,
+      added: 0,
+      errors: []
+    };
+    await api.delete('Summary/deleteAllSummary');
+    for (const record of newData) {
+      try {
+        let kcsr = record.kcsr;
+        if (kcsr === undefined || kcsr === null || kcsr === '') {
+          kcsr = '0000000000';
+        } else {
+          const num = parseFloat(String(kcsr).trim());
+          if (num === 0) {
+            kcsr = '0000000000';
+          }
+        }
+        record.kcsr = kcsr;
+  
+        await api.post('Summary/createSummary', record);
+        results.added++;
+      } catch (error) {
+        console.error(`Ошибка при обработке ${record.doc_num}:`, error.response?.data || error.message);
+        results.errors.push({ record, error: error.message });
+      }
+    }
+  
     return results;
   }
 }

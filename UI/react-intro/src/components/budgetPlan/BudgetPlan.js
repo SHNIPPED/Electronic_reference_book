@@ -63,12 +63,14 @@ function BudgetPlan() {
   const calculateTotalRow = (parent, children) => {
     const totalPlan2026 = parent.plan_2026 || 0;
     const totalPlan2027 = parent.plan_2027 || 0;
-    let totalObligations2026 = 0, totalApprovals2026 = 0, totalObligations2027 = 0, totalApprovals2027 = 0;
+    let totalObligations2026 = 0, totalApprovals2026 = 0, totalObligations2027 = 0, totalApprovals2027 = 0,totalin_execution = 0;
+
     children.forEach(child => {
       totalObligations2026 += Number(child.obligations_2026) || 0;
       totalApprovals2026 += Number(child.approvals_2026) || 0;
       totalObligations2027 += Number(child.obligations_2027) || 0;
       totalApprovals2027 += Number(child.approvals_2027) || 0;
+      totalin_execution +=Number(child.in_execution) || 0;
     });
     const balanceRemain2026 = totalPlan2026 - totalObligations2026 - totalApprovals2026;
     const balanceRemain2027 = totalPlan2027 - totalObligations2027 - totalApprovals2027;
@@ -318,7 +320,7 @@ function BudgetPlan() {
     { field: 'end_date', headerName: 'дата окончания договора', width: 150, valueFormatter: formatDate },
     { field: 'plan_2026', headerName: 'План 2026 год', width: 140, valueFormatter: formatNumber },
     { field: 'obligations_2026', headerName: 'Обязательства - Принято обязательств по расходам 2026', width: 280, valueFormatter: formatNumber },
-    { field: 'invoices', headerName: 'Выставлено счетов', width: 160 },
+    { field: 'in_execution', headerName: 'Выставлено счетов', width: 160 },
     { field: 'paid_total', headerName: 'Оплачено всего, в т.ч.', width: 200, valueFormatter: formatNumber },
     { field: 'balance_remain', headerName: 'Остаток для исполнения', width: 180, valueFormatter: formatNumber },
     { field: 'approvals_2026', headerName: 'Согласование служебок 2026 год', width: 250, editable: true, cellEditor: numberEditor, valueFormatter: formatNumber },

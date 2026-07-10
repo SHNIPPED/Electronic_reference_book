@@ -1,22 +1,6 @@
 import SummaryModule from "../models/SummaryModels.js";
 
 class ContractAdditionalController {
-  // Получить служебку по contract_id
-  static async getByContractId(req, res) {
-    try {
-      const { contractId } = req.params;
-      const result = await SummaryModule.getContractAdditional(contractId);
-      if (result) {
-        return res.status(200).json(result);
-      } else {
-        return res.status(404).json({ message: 'Служебка не найдена' });
-      }
-    } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Ошибка сервера' });
-    }
-  }
-
   // Создать служебку
   static async create(req, res) {
     try {

@@ -8,10 +8,13 @@ router.get('/',SummaryController.getAll);
 router.post('/create', SummaryController.create);
 router.post('/edit/:id', SummaryController.update);
 router.delete('/delete/:id', SummaryController.delete);
+router.post('/edit-single/:id', SummaryController.updateSingle);
+router.post('/createSummary',SummaryController.createSummary)
+router.delete('/deleteAllSummary', SummaryController.deleteAllSummary);
 
-router.get('/contract-additional/contract/:contractId', ContractAdditionalController.getByContractId);
 router.post('/contract-additional', ContractAdditionalController.create);
 router.put('/contract-additional/:id', ContractAdditionalController.update);
 router.delete('/contract-additional/contract/:contractId', ContractAdditionalController.deleteByContractId);
+
 
 export default router;

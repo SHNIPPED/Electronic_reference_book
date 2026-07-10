@@ -82,6 +82,7 @@ class SimpleTextEditor {
 function Summary() {
   const gridRef = useRef();
   const fileInputRef = useRef();
+  const fileInputSummaryRef = useRef();
   const saveTimeoutRef = useRef(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -163,15 +164,18 @@ function Summary() {
     try {
       const response = await api.get('Summary');
       let contracts = response.data.contracts || response.data || [];
-      const contractsWithService = await Promise.all(contracts.map(async (contract) => {
-        try {
-          const serviceRes = await api.get(`/Summary/contract-additional/contract/${contract.id}`);
-            if (serviceRes.data && serviceRes.data.id) {
-            return { ...contract, is_service: true, service_id: serviceRes.data.id, approvals_2026: serviceRes.data.approvals_2026, obligations_2027: serviceRes.data.obligations_2027, approvals_2027: serviceRes.data.approvals_2027 };
-          }
-        } catch (err) { /* нет служебки */ }
-        return { ...contract, is_service: false };
+  
+      // Теперь в каждом контракте уже есть поля:
+      // service_id, approvals_2026, obligations_2027, approvals_2027
+      const contractsWithService = contracts.map(contract => ({
+        ...contract,
+        is_service: !!contract.service_id, // если есть service_id – значит служебка существует
+        service_id: contract.service_id || null,
+        approvals_2026: contract.approvals_2026 || 0,
+        obligations_2027: contract.obligations_2027 || 0,
+        approvals_2027: contract.approvals_2027 || 0
       }));
+  
       setRowData(contractsWithService);
     } catch (err) {
       console.error('Ошибка загрузки:', err);
@@ -295,6 +299,27 @@ function Summary() {
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   }, [fetchData]);
+
+  const handleImportSummary = useCallback(async(event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    setLoading(true);
+    try {
+      const results = await SummaryExcelService.importSummaryFromExcel(file, api);
+      await fetchData();
+      let message = `Импорт завершен!\n`;
+      message += `Добавлено: ${results.added}\n`;
+      message += `Обновлено: ${results.updated}\n`;
+      if (results.errors.length > 0) message += `Ошибок: ${results.errors.length}`;
+      alert(message);
+    } catch (error) {
+      console.error('Ошибка импорта:', error);
+      alert(`Ошибка при импорте: ${error.message}`);
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  },[fetchData])
 
   const handleDeleteRow = useCallback(async () => {
     const selectedNodes = gridRef.current?.api.getSelectedNodes();
@@ -460,7 +485,7 @@ function Summary() {
 
       let savedContract;
       if (editingContract) {
-        await api.post(`Summary/edit/${editingContract.id}`, contractPayload);
+        await api.post(`Summary/edit-single/${editingContract.id}`, contractPayload);
         savedContract = { ...editingContract, ...contractPayload, id: editingContract.id };
       } else {
         const res = await api.post('Summary/create', contractPayload);
@@ -518,7 +543,9 @@ function Summary() {
         <button onClick={handleDeleteRow} className="summary-btn summary-btn-delete">- Удалить выбранные</button>
         <button onClick={fetchData} className="summary-btn summary-btn-refresh">Обновить</button>
         <button onClick={() => fileInputRef.current.click()} className="summary-btn summary-btn-import">Загрузить из Excel</button>
+        <button onClick={() => fileInputSummaryRef.current.click()} className="summary-btn summary-btn-import">Загрузить Сводную</button>
         <input ref={fileInputRef} type="file" accept=".xlsx,.xls,.xlt,.xltx" style={{ display: 'none' }} onChange={handleImport} />
+        <input ref={fileInputSummaryRef} type="file" accept=".xlsx,.xls,.xlt,.xltx" style={{ display: 'none' }} onChange={handleImportSummary} />
         {savingRows.size > 0 && <span className="summary-saving-indicator">Сохранение...</span>}
         <button className="summary-btn summary-btn-nav" onClick={() => navigate("/execution")}>Перейти к ПФХД</button>
         <button className="summary-btn summary-btn-nav" onClick={() => navigate("/BudgetPlan")}>Перейти к отчетам</button>
@@ -580,9 +607,6 @@ function Summary() {
 
               <label>Исполнено в прошлых периодах</label>
               <input type="text" name="exec_past_periods" value={contractForm.exec_past_periods} onChange={handleFormChange} inputMode="numeric" />
-
-              <label>В исполнении</label>
-              <input type="text" name="in_execution" value={contractForm.in_execution} onChange={handleFormChange} inputMode="numeric" />
 
               <label>Сумма аванса</label>
               <input type="text" name="advance_sum" value={contractForm.advance_sum} onChange={handleFormChange} inputMode="numeric" />
