@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect ,useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import trash from "../pictures/trash.png";
 import edit from "../pictures/edit.png";
@@ -16,7 +16,7 @@ function Phone(){
     const [editingUser, setEditingUser] = useState(null);
     const navigate = useNavigate();
 
-    const fetchData = async () => {
+    const fetchData = useCallback(async () => {
         try {
             const response = await api.get(`PhoneBook`);
             
@@ -30,11 +30,11 @@ function Phone(){
             console.error("Ошибка при загрузке данных:", error); 
             sortPeople([]);
         }
-    }
+    }, [])
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
 
     const sortPeople = (data) =>{
         const departments = {};

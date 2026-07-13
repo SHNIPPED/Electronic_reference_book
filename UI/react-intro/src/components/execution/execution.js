@@ -201,7 +201,7 @@ function Execution() {
     } finally {
       setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
     }
-  }, []);
+  }, [savingRows]);
 
   const saveNewRowToDB = useCallback(async (row) => {
     if (!row.is_new) return true;

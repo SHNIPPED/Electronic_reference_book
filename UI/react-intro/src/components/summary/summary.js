@@ -165,11 +165,9 @@ function Summary() {
       const response = await api.get('Summary');
       let contracts = response.data.contracts || response.data || [];
   
-      // Теперь в каждом контракте уже есть поля:
-      // service_id, approvals_2026, obligations_2027, approvals_2027
       const contractsWithService = contracts.map(contract => ({
         ...contract,
-        is_service: !!contract.service_id, // если есть service_id – значит служебка существует
+        is_service: !!contract.service_id,
         service_id: contract.service_id || null,
         approvals_2026: contract.approvals_2026 || 0,
         obligations_2027: contract.obligations_2027 || 0,
@@ -263,7 +261,7 @@ function Summary() {
     } finally {
       setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
     }
-  }, []);
+  }, [savingRows]);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;

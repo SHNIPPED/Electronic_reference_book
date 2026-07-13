@@ -63,14 +63,14 @@ function BudgetPlan() {
   const calculateTotalRow = (parent, children) => {
     const totalPlan2026 = parent.plan_2026 || 0;
     const totalPlan2027 = parent.plan_2027 || 0;
-    let totalObligations2026 = 0, totalApprovals2026 = 0, totalObligations2027 = 0, totalApprovals2027 = 0,totalin_execution = 0;
+    let totalObligations2026 = 0, totalApprovals2026 = 0, totalObligations2027 = 0, totalApprovals2027 = 0;//totalin_execution = 0;
 
     children.forEach(child => {
       totalObligations2026 += Number(child.obligations_2026) || 0;
       totalApprovals2026 += Number(child.approvals_2026) || 0;
       totalObligations2027 += Number(child.obligations_2027) || 0;
       totalApprovals2027 += Number(child.approvals_2027) || 0;
-      totalin_execution +=Number(child.in_execution) || 0;
+      //totalin_execution +=Number(child.in_execution) || 0;
     });
     const balanceRemain2026 = totalPlan2026 - totalObligations2026 - totalApprovals2026;
     const balanceRemain2027 = totalPlan2027 - totalObligations2027 - totalApprovals2027;
@@ -279,7 +279,7 @@ function BudgetPlan() {
     } finally {
       setSavingRows(prev => { const newSet = new Set(prev); newSet.delete(row.id); return newSet; });
     }
-  }, []);
+  }, [savingRows]);
 
   const onCellValueChanged = useCallback(async (params) => {
     const { data, colDef, newValue, oldValue } = params;

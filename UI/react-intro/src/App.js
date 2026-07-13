@@ -5,7 +5,6 @@ import Phone from './components/phone/phone'
 import List from './components/list';
 import Host from './components/hosts/hosts'
 import Login from './components/login/login'
-import SnakeGame from './components/snake/Snake'
 import removal from './removal/removal';
 import Summary from './components/summary/summary';
 import execution from './components/execution/execution';
@@ -19,7 +18,6 @@ function App () {
           <Route path='/PhoneBook' Component={PhoneBook} />
           <Route path='/Host' Component={Host} />
           <Route path='/Login?' Component={Login} />
-          <Route path='/SnakeGame' Component={SnakeGame} />
           <Route path='/Removal' Component={removal} />
           <Route path='/Phone' Component={Phone} />
           <Route path='/Summary' Component={Summary} />

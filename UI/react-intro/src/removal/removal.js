@@ -9,7 +9,7 @@ function removal(){
     return(
         <div class="app_removal">
             <div class="removal">
-                <img class="clean" src={clean}/>
+                <img class="clean" src={clean} alt="clean"/>
                 Мы переехали
             </div>
             <div>
