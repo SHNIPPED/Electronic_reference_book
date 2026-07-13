@@ -1,5 +1,4 @@
 import React from "react";
-import logo from './pictures/DES_gor_blue1.svg';
 import logo1 from './pictures/DES_gor_blue.png'
 import qrtg from './pictures/qrtg.png'
 import qrvk from './pictures/qrvk.png'
@@ -19,10 +18,7 @@ import clean from './pictures/clean.png'
 import tko from './pictures/1c_tko.png'
 import erp from './pictures/1c_erp.png'
 
-import { redirect, useNavigate } from "react-router-dom";
-
 function List(){
-    const navigate = useNavigate();
 
     const handelNavigate = (url)=>{
         window.open(url)
@@ -43,10 +39,10 @@ function List(){
         <div>
             <div  class="list-logo" >
                 <div class="list-div-in" >
-                    <img class="clean" src={clean}/>
-                    <img class="App-logo" src={logo1}/>
-                    <img class="list-qrtg " src={qrtg} />
-                    <img class="App-qrvk" src={qrvk}/>
+                    <img class="clean" src={clean} alt="clean"/>
+                    <img class="App-logo" src={logo1} alt="ДЭС"/>
+                    <img class="list-qrtg " src={qrtg} alt="tg" />
+                    <img class="App-qrvk" src={qrvk} alt="vk"/>
                     <button class="list-button-hidden" onClick={handleLoginRedirect}/>
                 </div>
             </div>

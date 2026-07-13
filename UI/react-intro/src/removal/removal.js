@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React from 'react';
 import clean from '../components/pictures/clean.png'
 import './removal.css'
 
