@@ -112,5 +112,5 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Pull images and run docker-compose
         run: |
-          docker-compose -f docker-compose.yml pull
-          docker-compose -f docker-compose.yml up -d
+          docker compose -f docker-compose.prod.yml pull
+          docker compose -f docker-compose.prod.yml up -d
